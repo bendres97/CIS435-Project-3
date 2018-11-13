@@ -21,7 +21,7 @@ public class ChatServer {
    /**
     * Port to listen on, if none is specified on the command line.
     */
-   static final int DEFAULT_PORT = 1729;
+   static final int DEFAULT_PORT = 1728;
 
    /**
     * Handshake string. Each end of the connection sends this  string to the 
