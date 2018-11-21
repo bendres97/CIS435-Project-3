@@ -1,5 +1,6 @@
 package SSL;
 
+import Network.Packet;
 import java.io.*;
 import java.net.*;
 
@@ -73,10 +74,13 @@ public class ChatServer
             outgoing.println(HANDSHAKE);  // Send handshake to client.
             outgoing.flush();
             messageIn = incoming.readLine();  // Receive handshake from client.
+            
             if (!HANDSHAKE.equals(messageIn))
             {
                 throw new Exception("Connected program is not a ChatClient!");
             }
+            Packet pk = new Packet();
+            
             System.out.println("Connected.  Waiting for the first message.");
         }
         catch (Exception e)
