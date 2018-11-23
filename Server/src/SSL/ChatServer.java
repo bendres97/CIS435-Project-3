@@ -1,8 +1,11 @@
 package SSL;
 
+import Cryptography.RSA;
 import Network.Packet;
 import java.io.*;
+import java.math.BigInteger;
 import java.net.*;
+import java.util.Random;
 
 /**
  * This program is one end of a simple command-line interface chat program. It
@@ -79,7 +82,17 @@ public class ChatServer
             {
                 throw new Exception("Connected program is not a ChatClient!");
             }
+            
+            String algorithms = "Shift Cipher + RSA + MAC,Polyalphabetic Cipher + RSA + MAC,Subsitution Cipher + RSA + MAC";
+            String[] parsing = algorithms.split(",");
+
+            Random rng = new Random();
+
+            BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
+          
             Packet pk = new Packet();
+          
+            pk.setSessionKey(servNonce);
             
             System.out.println("Connected.  Waiting for the first message.");
         }
