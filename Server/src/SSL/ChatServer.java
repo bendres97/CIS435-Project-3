@@ -86,6 +86,12 @@ public class ChatServer
             String algorithms = "Shift Cipher + RSA + MAC,Polyalphabetic Cipher + RSA + MAC,Subsitution Cipher + RSA + MAC";
             String[] parsing = algorithms.split(",");
 
+            System.out.println("This is the different Ciphers that the Server has");
+            for(int i = 0; i <parsing.length; i++)
+            {
+              System.out.println(parsing[i]);
+            }
+            
             Random rng = new Random();
 
             BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
