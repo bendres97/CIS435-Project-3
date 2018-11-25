@@ -105,13 +105,13 @@ public class SecureMessageSystem
                     //ShiftCipher + RSA + MAC+ Digital Signature + CA
                     case CASE1:
                         ShiftCipher shiftCipher = new ShiftCipher();
-                        result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, ASCII.StringtoBigInt(amy.getSecret())));
+                        result = ASCII.BigIntToString(shiftCipher.decrypt(decMsg, ASCII.StringtoBigInt(amy.getSecret())));
                         break;
 
                     //SubsitutionCipher + RSA + Digital Signature + MAC + CA
                     case CASE2:
                         SubsitutionCipher subCipher = new SubsitutionCipher();
-                        result = subCipher.decrypt(ASCII.BigIntToString(decMsg), net.getSubKey());
+                        result = subCipher.decrypt(decMsg, net.getSubKey());
                         break;
 
                     //PolyalphabeticCipher + RSA +Digital Signature + MAC + CA

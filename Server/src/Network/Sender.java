@@ -77,38 +77,38 @@ public class Sender implements SenderADT
     @Override
     public BigInteger generateMessage(int testCase, Network net, Receiver rec)
     {
-        String message = "This is the plaintext message.";
+        String message = "This is the plaintext message."; 
         BigInteger msg = ASCII.StringtoBigInt(message);
         switch (testCase)
         {
             //ShiftCipher + RSA + MAC+ Digital Signature + CA
             case CASE1:
                 ShiftCipher shiftCipher = new ShiftCipher();
-                msg = shiftCipher.Encrypt(msg, ASCII.StringtoBigInt(SECRET));
+                msg = shiftCipher.encrypt(msg, SECRET);
                 break;
 
             //SubsitutionCipher + RSA + Digital Signature + MAC + CA
             case CASE2:
-                SubstitutionCipher subCipher = new SubstitutionCipher();
-                msg = ASCII.StringtoBigInt(subCipher.Encrypt(message, net.getSubKey()));
+                SubsitutionCipher subCipher = new SubsitutionCipher();
+                msg = subCipher.encrypt(message, net.getSubKey());
                 break;
 
             //PolyalphabeticCipher + RSA +Digital Signature + MAC + CA
             case CASE3:
                 PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
-                msg = ASCII.StringtoBigInt(polyCipher.encrypt(message, SECRET));
+                msg = ASCII.StringtoBigInt(polyCipher.encrypt(msg, SECRET));
                 break;
 
             //CBC + RSA + MAC + Digital Signature + CA
             case CASE4:
-                CipherBlockChain cbc = new CipherBlockChain();
-                msg = ASCII.StringtoBigInt(cbc.Encrypt(message, net.getIV()));
+                CipherBlockChaining cbc = new CipherBlockChaining();
+                msg = ASCII.StringtoBigInt(cbc.encrypt(msg, net.getIV()));
                 break;
 
             //Block Cipher + RSA + MAC + Digital Signature + CA
             case CASE5:
                 BlockCipher block = new BlockCipher();
-                msg = ASCII.StringtoBigInt(block.encrypt(message));
+                msg =block.encrypt(msg);
                 break;
 
             //Default Case - Bad data is entered
@@ -119,7 +119,7 @@ public class Sender implements SenderADT
 
         //MAC
       //  message = ASCII.BigIntToString(msg);
-        msg = net.MAC.authenticate(message, SECRET);
+        msg = net.MAC.mACEncrypt(msg, SECRET);
 
         //Encrypt with RSA
         msg = ASCII.StringtoBigInt(message);
@@ -135,7 +135,7 @@ public class Sender implements SenderADT
      * @return The secret
      */
     @Override
-    public String getSecret()
+    public BigInteger getSecret()
     {
         return SECRET;
     }
