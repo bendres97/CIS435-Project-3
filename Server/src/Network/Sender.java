@@ -25,7 +25,7 @@ public class Sender implements SenderADT
     private static final AsciiConverter ASCII = new AsciiConverter();
 
     //Universal secret to be used for certain methods
-    private final String SECRET = "CIS435";
+    private final BigInteger SECRET = ASCII.StringtoBigInt("CIS435");
 
     /**
      * Returns a sender with a pre-propagated packet.
@@ -118,8 +118,8 @@ public class Sender implements SenderADT
         }
 
         //MAC
-        message = ASCII.BigIntToString(msg);
-        message = ASCII.BigIntToString(net.MAC.authenticate(message, SECRET));
+      //  message = ASCII.BigIntToString(msg);
+        msg = net.MAC.authenticate(message, SECRET);
 
         //Encrypt with RSA
         msg = ASCII.StringtoBigInt(message);

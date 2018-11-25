@@ -1,6 +1,5 @@
 package Cryptography;
 
-
 import java.math.BigInteger;
 
 /**
@@ -21,7 +20,7 @@ public class ShiftCipher
      * @return encrypted message
      *
      */
-    public BigInteger Encrypt(BigInteger msg, BigInteger shift)
+    public BigInteger encrypt(BigInteger msg, BigInteger shift)
     {
 
         return msg.add(shift);
@@ -36,7 +35,7 @@ public class ShiftCipher
      * @return encrypted message
      *
      */
-    public BigInteger Decrypt(BigInteger cipher, BigInteger shift)
+    public BigInteger decrypt(BigInteger cipher, BigInteger shift)
     {
 
         return cipher.subtract(shift);

@@ -1,30 +1,27 @@
 package Cryptography;
 
+/**
+*
+*Interface for PolyalphabeticCipher
+* Uses PolyalphabeticCipher shift a message using shift values
+* 
+* Solves CIS435+535 Project #1 Cryptography
+*
+* @author Andrew Bradley
+* 		
+* @version 1.01 09-30-2018
+*/
+import java.math.BigInteger;
+import java.util.List;
 
 /**
- *The ADT for Polyalphabetic Cipher.
- *
- * @author Bryan Endres ID: 8
- * @date 9-30-2018
- */
+Interface that abstract methods to be 
+performed on a PolyalphabeticCipher
+@author Andrew Bradley
+@version 1.00 	2018-09-18
+*/
 public interface PolyalphabeticCipherADT
 {
-
-    /**
-     * Encrypts the given message using the given shifter.
-     *
-     * @param msg The message to encrypt
-     * @param shift The shift to use
-     * @return the encrypted ciphertext.
-     */
-    public String Encrypt(String msg, String shift);
-
-    /**
-     * Decrypts the given ciphertext using the given shifter.
-     *
-     * @param msg The ciphertext to decrypt
-     * @param shift The shift used for encryption
-     * @return The decrypted plaintext
-     */
-    public String Decrypt(String msg, String shift);
+	public BigInteger encrypt(BigInteger msg, BigInteger shiftValues);
+	public BigInteger decrypt(BigInteger msg, BigInteger shiftValues);
 }

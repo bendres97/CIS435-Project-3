@@ -7,8 +7,8 @@
             <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/NetworkADT.java</file>
             <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/SecureMessageSystem.java</file>
             <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/Sender.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/Packet.java</file>
             <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/RSAKey.java</file>
+            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/SSL/SSLRecord.java</file>
             <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/SSL/ChatServer.java</file>
         </group>
     </open-files>

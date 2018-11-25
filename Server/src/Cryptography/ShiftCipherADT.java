@@ -1,44 +1,49 @@
 package Cryptography;
 
-
 import java.math.BigInteger;
 
 
 /**
  * This defines the interface for shiftCiper that
  * encrypts and decrypts a given BigInteger using a shared key
- * @author yunwang
- * @date Unknown
+ * @author Andrew Bradley
  */
 public interface ShiftCipherADT {
     
-    /**
-     * Encrypt a BigInteger "msg" with a given key "shift".
-     * For example, 
-     * Suppose "msg = 10" and "shift = 5";
-     * Encrypt(10, 5) return "15"
-     *
-     * @param msg  the message
-     * @param shift the shift encryption key
-     * @return encrypted message
-     * 
-     */
+	/**
+	 * Instead of adding shift to message, the letters will shift right in
+	 * accordance to the alphabet
+	 * 
+	 * For example, suppose Hello is in the tester, it turns into big integer by
+	 * using ascii converter Encrypt will convert the BigInteger back to string
+	 * and shift the string to the right in accordance to how big shift is
+	 *
+	 * @param msg
+	 *            the message
+	 * @param shift
+	 *            the shift encryption key
+	 * @return encrypted message
+	 * 
+	 */
 
-
-    public BigInteger Encrypt(BigInteger msg, BigInteger shift);
+    public BigInteger encrypt(BigInteger msg, BigInteger shift);
     
-     /**
-     * Decrypt a BigInteger "cipher" with a given key "shift".
-     * For example, 
-     * Suppose "cipher = 15" and "shift = 5";
-     * Decrypt(15, 5) return "10"
-     *
-     * @param cipher  the encrypted msg
-     * @param shift the shift encryption key
-     * @return encrypted message
-     * 
-     */
+	/**
+	 * Instead of adding shift to message, the letters will shift right in
+	 * accordance to the alphabet
+	 * 
+	 * For example, suppose Hello is in the tester, it turns into big integer by
+	 * using ascii converter Decrypt will convert the BigInteger back to string
+	 * and shift the string to the left in accordance to how big shift is
+	 *
+	 * @param msg
+	 *            the message
+	 * @param shift
+	 *            the shift encryption key
+	 * @return encrypted message
+	 * 
+	 */
 
-    public BigInteger Decrypt(BigInteger cipher, BigInteger shift);
+    public BigInteger decrypt(BigInteger cipher, BigInteger shift);
     
 }

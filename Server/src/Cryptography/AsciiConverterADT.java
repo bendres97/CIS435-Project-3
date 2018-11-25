@@ -3,15 +3,15 @@ package Cryptography;
 
 import java.math.BigInteger;
 
-/**
- * The interface of AsciiConverter to convert String message to BigInteger data
- * and visa versa.
- *
- * @author yunwang
- */
-public interface AsciiConverterADT
-{
 
+/**
+ * The interface of AsciiConverter
+ * to convert String message to BigInteger data and visa
+ * versa.
+ * @author yunwang, edited by Andrew Bradley
+ */
+public interface AsciiConverterADT {
+    
     /**
      * Convert String message into BigInteger data. For example: if inStr =
      * "Hello", return result = 172201208208211. Note that, for each character,
@@ -22,8 +22,9 @@ public interface AsciiConverterADT
      * @return the BigInteger data of the inStr using (shifted) ASCII table
      *
      */
-    public BigInteger StringtoBigInt(String inStr);
 
+    public BigInteger StringtoBigInt(String inStr);
+    
     /**
      * Convert BigInteger data to String message. For example: if inBigInt
      * =172201208208211, return result = "Hello" . Note that, for each
@@ -35,6 +36,7 @@ public interface AsciiConverterADT
      * @return the String message of the inBigInt using (shifted) ASCII table
      *
      */
+
     public String BigIntToString(BigInteger inBigInt);
 
 }

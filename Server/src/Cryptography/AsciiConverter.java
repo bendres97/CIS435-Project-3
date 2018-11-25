@@ -1,18 +1,19 @@
 package Cryptography;
 
-
 import java.math.BigInteger;
 
 /**
  *
  * AsciiConverter is to convert String message to BigInteger data and visa
- * versa. Solves CIS435+535 Project #1 Cryptography
+ * versa. 
+ * Solves CIS435+535 Project #1 Cryptography
  *
- * @author Yun Wang
+ * @author Yun Wang, edited by Andrew Bradley
+ * 		Dr. Wang gave me this code from Sakai
  * @version 1.01 09-07-2018
  */
-public class AsciiConverter implements AsciiConverterADT
-{
+public class AsciiConverter implements AsciiConverterADT {
+
 
     /**
      * Convert String message into BigInteger data. For example: if inStr =
@@ -24,21 +25,17 @@ public class AsciiConverter implements AsciiConverterADT
      * @return the BigInteger data of the inStr using (shifted) ASCII table
      *
      */
-    public BigInteger StringtoBigInt(String inStr)
-    {
+    public  BigInteger StringtoBigInt(String inStr) {
 
         String result = "";
 
-        for (int i = 0; i < inStr.length(); i++)
-        {
+        for (int i = 0; i < inStr.length(); i++) {
 
             char ch = inStr.charAt(i);
 
             result += (ch + 100); // add 100 to make  three digits for all characters
-            // System.out.println("\tch = " + ch + ", result = " + result);
 
         }
-        //  System.out.println("\tAsciiConverter (Converted) result = " + result);
 
         return new BigInteger(result);
 
@@ -55,8 +52,7 @@ public class AsciiConverter implements AsciiConverterADT
      * @return the String message of the inBigInt using (shifted) ASCII table
      *
      */
-    public String BigIntToString(BigInteger inBigInt)
-    {
+    public  String BigIntToString(BigInteger inBigInt) {
 
         String result = "";
 
@@ -65,24 +61,22 @@ public class AsciiConverter implements AsciiConverterADT
         int length = inString.length();
         int numChar = length / 3;
 
-        // System.out.println("\tlength = " + length + ", numChar =  " + numChar);
         int index = 0;
-        for (int i = 0; i < numChar; i++)
-        {
+        for (int i = 0; i < numChar; i++) {
 
             String temp = inString.substring(index, index + 3);
 
             int charInt = Integer.parseInt(temp);
             char ch = (char) (charInt - 100);
 
-            // System.out.println("\ttemp = " + temp + ", charInt = " + charInt + ", ch = " + ch);
             result += ch;
             index += 3;
 
         }
-        //   System.out.println("\tresult = " + result);
+        //System.out.println("\tresult = " + result);
         return result;
 
     }
 
+    
 }
