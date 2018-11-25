@@ -19,7 +19,7 @@ public interface MACADT
      * @param secret BigInteger representation of the secret
      * @return The encrypted message
      */
-    public BigInteger authenticate(String msg, String secret);
+    public BigInteger authenticate(BigInteger message, BigInteger secret);
 
     /**
      * Decrypt the given cipher with the given initial secret and hashed secret.
@@ -28,5 +28,5 @@ public interface MACADT
      * @param secret The hashed secret
      * @return The plaintext message.
      */
-    public boolean checkIntegrity(BigInteger msg, String secret);
+    public boolean checkIntegrity(BigInteger message, BigInteger secret);
 }

@@ -24,32 +24,40 @@ public class MAC implements MACADT
     }
 
     @Override
-    public BigInteger authenticate(String msg, String secret)
+    public BigInteger authenticate(BigInteger message, BigInteger secret)
     {
-        //Concatenate msg and secret and convert to BigInteger 
-        BigInteger concatenation = ASCII.StringtoBigInt(secret + msg);
+		String msg = ASCII.BigIntToString(message);
+		String sec = ASCII.BigIntToString(secret);
 
-        //Mod the concatenation by the hash value
-        BigInteger hashedValue = concatenation.mod(HASH);
+		System.out.println("This is a secret: " + sec);
 
-        //Concatenate the new hash onto the string
-        BigInteger mac = ASCII.StringtoBigInt((char) hashedValue.intValue() + msg);
+		//Concatenates the message and the secret
+		String con = sec + msg;
+		System.out.println("I concatinated this: " + con);
 
-        return mac;
+		//Hashing the message with the secret
+		BigInteger concatenate = ASCII.StringtoBigInt(con);
+	
+		
+		BigInteger moding = concatenate.mod(HASH);
+		
+		//Converting moding using ascii converter
+		
+		BigInteger big = ASCII.StringtoBigInt((char) moding.intValue() + msg);
+
+		return big;
     }
 
     @Override
-    public boolean checkIntegrity(BigInteger msg, String secret)
-    {
-        //Convert the message to a string and drop off the hashed secret
-        String message = ASCII.BigIntToString(msg);
-        message = message.substring(1); //Drop off secret on front of message
+    public boolean checkIntegrity(BigInteger message, BigInteger secret)
+    {				
+		String msg = ASCII.BigIntToString(message);
+		//takes out the hash from message
+		msg = msg.substring(1);
 
-        //Call authenticate to rehash the message
-        BigInteger check = authenticate(message, secret);
+		//places the hash into BigInteger form to encrypt MAC
+		BigInteger MACEncrypt = authenticate(ASCII.StringtoBigInt(msg), secret);
 
-        //Check the integrity of the received msg
-        return check.equals(msg);
+		return MACEncrypt.equals(message);
     }
-
 }

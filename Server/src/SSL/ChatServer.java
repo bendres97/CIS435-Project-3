@@ -92,6 +92,7 @@ public class ChatServer
               System.out.println(parsing[i]);
             }
             
+            
             Random rng = new Random();
 
             BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
@@ -138,10 +139,11 @@ public class ChatServer
                 System.out.println("RECEIVED:  " + messageIn);
                 System.out.print("SEND:      ");
                 messageOut = userInput.readLine();
+                messageOut+= " ";
                 if (messageOut.equalsIgnoreCase("quit"))
                 {
                     // User wants to quit.  Inform the other side
-                    // of the connection, then close the connection.
+                    // of the connection, then close the connection
                     outgoing.println(CLOSE);
                     outgoing.flush();  // Make sure the data is sent!
                     connection.close();
