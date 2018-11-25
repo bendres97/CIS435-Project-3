@@ -3,6 +3,7 @@ package Cryptography;
 
 import java.math.BigInteger;
 import java.util.Random;
+import javafx.util.Pair;
 
 /**
  * RSA object generates its keys at instantiation and encrypts or decrypts
@@ -120,4 +121,63 @@ public class RSA implements RSAADT
     {
         return PRIVATE_KEY;
     }
+    
+    
+    /**
+	 * 
+	 * Decrypts the RSA
+	 * Since it is encrypting, it is taking the mod pow of e and n
+	 * @param BigInteger message
+	 * 		Receives the message that is generating in the rsa
+	 * @return encrypted public key
+	 * 
+	 */
+	public BigInteger getDecPubKey(BigInteger message) {
+		
+		//Returns the public key
+		//THis is from the encrypt from RSA
+		return message.modPow(E, N);
+
+	}
+	/**
+	 * 
+	 * Decrypts the RSA
+	 * Since it is encrypting, it is taking the mod pow of d and n
+	 * @param BigInteger message
+	 * 		Receives the message that is generating in the rsa
+	 * @return encrypted private key
+	 * 
+	 */
+	public BigInteger getDecPriKey(BigInteger encryptedMessage) {
+
+		//returns the private key
+		//this is from the decrypt from RSA
+		return encryptedMessage.modPow(D, N);
+		
+		
+	}
+	/**
+	 * This class is for Digital Signature class
+	 @param BigInteger message
+	 * 		Receives the message that is generating in the rsa
+	 * @return the e and the n so the public key can be accessed
+	 */
+	public Pair<BigInteger, BigInteger> getPubKey()	
+	{
+		Pair<BigInteger, BigInteger> getPubKey = new  Pair<BigInteger, BigInteger>(E,N);
+		
+		return getPubKey;
+	}
+	/**
+	 * This class is for Digital Signature class
+	 @param BigInteger message
+	 * 		Receives the message that is generating in the rsa
+	 * @return the e and the n so the public key can be accessed
+	 */
+	public Pair<BigInteger, BigInteger> getPrivKey()	
+	{
+		Pair<BigInteger, BigInteger> getPrivKey = new  Pair<BigInteger, BigInteger>(D,N);
+		
+		return getPrivKey;
+	}
 }

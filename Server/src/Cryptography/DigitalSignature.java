@@ -20,7 +20,7 @@ import javafx.util.Pair;
 public class DigitalSignature implements DigitalSignatureADT{
 	private BigInteger hash;
 	private final int MOD = 128;
-	private RSA1 rsa; 
+	private RSA rsa; 
 	/**
 	 * The constructor for Digital Signature
 	 * Establishes the hash variable and rsa class
@@ -28,7 +28,7 @@ public class DigitalSignature implements DigitalSignatureADT{
 	public DigitalSignature() {
 		//creates the hash
 		hash = new BigInteger(String.valueOf(MOD));
-		rsa = new RSA1();
+		rsa = new RSA();
 	}
 
 	/**

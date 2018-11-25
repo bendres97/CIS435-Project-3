@@ -96,7 +96,7 @@ public class Sender implements SenderADT
             //PolyalphabeticCipher + RSA +Digital Signature + MAC + CA
             case CASE3:
                 PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
-                msg = ASCII.StringtoBigInt(polyCipher.Encrypt(message, SECRET));
+                msg = ASCII.StringtoBigInt(polyCipher.encrypt(message, SECRET));
                 break;
 
             //CBC + RSA + MAC + Digital Signature + CA
@@ -108,7 +108,7 @@ public class Sender implements SenderADT
             //Block Cipher + RSA + MAC + Digital Signature + CA
             case CASE5:
                 BlockCipher block = new BlockCipher();
-                msg = ASCII.StringtoBigInt(block.Encrypt(message));
+                msg = ASCII.StringtoBigInt(block.encrypt(message));
                 break;
 
             //Default Case - Bad data is entered
