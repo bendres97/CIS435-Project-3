@@ -93,13 +93,13 @@ public class SecureMessageSystem
             BigInteger signature = rec.getSignature();
 
             //Check the integrity of the message, only decrypt if authentic.
-            if (net.MAC.checkIntegrity(decMsg, amy.getSecret()) && net.DS.authenticate(signature, message))
+            if (net.MAC.checkIntegrity(decMsg, amy.getSecret()) && net.DS.compare(signature, message))
             {
                 String msgString = ASCII.BigIntToString(decMsg).substring(1);
                 decMsg = ASCII.StringtoBigInt(msgString);
 
                 System.out.println("Message is authentic");
-                String result = "";
+                BigInteger result = BigInteger.valueOf(0);
                 switch (testCase)
                 {
                     //ShiftCipher + RSA + MAC+ Digital Signature + CA
@@ -110,26 +110,26 @@ public class SecureMessageSystem
 
                     //SubsitutionCipher + RSA + Digital Signature + MAC + CA
                     case CASE2:
-                        SubstitutionCipher subCipher = new SubstitutionCipher();
-                        result = subCipher.Decrypt(ASCII.BigIntToString(decMsg), net.getSubKey());
+                        SubsitutionCipher subCipher = new SubsitutionCipher();
+                        result = subCipher.decrypt(ASCII.BigIntToString(decMsg), net.getSubKey());
                         break;
 
                     //PolyalphabeticCipher + RSA +Digital Signature + MAC + CA
                     case CASE3:
                         PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
-                        result = polyCipher.Decrypt(ASCII.BigIntToString(decMsg), amy.getSecret());
+                        result = polyCipher.decrypt(decMsg, amy.getSecret());
                         break;
 
                     //CBC + RSA + MAC + Digital Signature + CA
                     case CASE4:
-                        CipherBlockChain cbc = new CipherBlockChain();
-                        result = cbc.Decrypt(ASCII.BigIntToString(decMsg), net.getIV());
+                        CipherBlockChaining cbc = new CipherBlockChaining();
+                        result = cbc.decrypt(decMsg, net.getIV());
                         break;
 
                     //Block Cipher + RSA + MAC + Digital Signature + CA
                     case CASE5:
                         BlockCipher block = new BlockCipher();
-                        result = block.Decrypt(ASCII.BigIntToString(decMsg));
+                        result = block.encrypt(decMsg);
                         break;
                 }
 
