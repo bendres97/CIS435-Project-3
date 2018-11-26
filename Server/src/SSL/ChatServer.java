@@ -121,8 +121,10 @@ public class ChatServer
             
             BigInteger privateKey = rsa.getPrivateKey().getEXP().add(rsa.getPrivateKey().getN());
             BigInteger publicKey =  rsa.getPublicKey().getEXP().add(rsa.getPublicKey().getN());
-            String keys = privateKey + "," +publicKey;
-            //BigInteger bigKey = new BigInteger (keys);
+            String stringPrivateKey = privateKey.toString();
+            String stringPublicKey = publicKey.toString();
+            String keys = (stringPrivateKey + stringPublicKey);
+            BigInteger bigKey = new BigInteger (keys);
            // System.out.println(bigKey);
             Packet pk = new Packet(servNonce, cipher, bigKey);
 
