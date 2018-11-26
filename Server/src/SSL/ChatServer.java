@@ -124,76 +124,78 @@ public class ChatServer
             RSA rsa = new RSA();
             
             BigInteger privateKey = rsa.getPrivateKey().getEXP().add(rsa.getPrivateKey().getN());
-            BigInteger publicKey =  rsa.getPublicKey().getEXP().add(rsa.getPublicKey().getN());
-            String stringPrivateKey = privateKey.toString();
-            String stringPublicKey = publicKey.toString();
+            BigInteger publicKeyEXP =  rsa.getPublicKey().getEXP();
+            BigInteger publicKeyN = rsa.getPublicKey().getN();
+    
             
            // System.out.println(bigKey);
-            Packet pk1 = new Packet(servNonce, cipher, publicKey);
-            
+            Packet pk1EXP = new Packet(servNonce, cipher, publicKeyEXP);
+            Packet pk1N = new Packet(servNonce, cipher,publicKeyN);
 
             System.out.println("Connected.  Waiting for the first message.");
             
             
-            outgoing.print(pk1);
+            outgoing.print(pk1EXP);
+            outgoing.print(pk1N);
             
-            //handshake portion 2
-            BigInteger session2 = BigInteger.valueOf(incoming.read());
-            BigInteger message2 = BigInteger.valueOf(incoming.read());
-            BigInteger signature2 = BigInteger.valueOf(incoming.read());
-            Packet clientPK2 = new Packet(session2, message2, signature2);
-            BigInteger mes = clientPK2.getMessage();
-            BigInteger ses =  clientPK2.getSessionKey();
-            BigInteger sig = clientPK2.getSignature();
+//            //handshake portion 2
+//            BigInteger session2 = BigInteger.valueOf(incoming.read());
+//            BigInteger message2 = BigInteger.valueOf(incoming.read());
+//            BigInteger signature2 = BigInteger.valueOf(incoming.read());
+//            Packet clientPK2 = new Packet(session2, message2, signature2);
+//            BigInteger mes = clientPK2.getMessage();
+//            BigInteger ses =  clientPK2.getSessionKey();
+//            BigInteger sig = clientPK2.getSignature();
+//            
+//            BigInteger diffKeys = mes.multiply(ses).multiply(sig);
+//            String stringofKeys = diffKeys.toString();
+//           
+//            if(stringofKeys.length()%8!=0)
+//            {
+//                switch (stringofKeys.length()%8) {
+//                    case 7:
+//                        stringofKeys+="0";
+//                        break;
+//                    case 6:
+//                        stringofKeys+="00";
+//                        break;
+//                    case 5:
+//                        stringofKeys+="000";
+//                        break;
+//                    case 4:
+//                        stringofKeys+="0000";
+//                        break;
+//                    case 3:
+//                        stringofKeys+="00000";
+//                        break;
+//                    case 2:
+//                        stringofKeys+="000000";
+//                        break;
+//                    case 1:
+//                        stringofKeys+="0000000";
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//            String k [] = null;
+//           
+//            for(int i = 0; i<stringofKeys.length(); i+=2)
+//            {
+//                int j = 0;
+//                k[j] = stringofKeys.substring(i, i+1);
+//                j++;
+//            }
+//            
+//            String Kc = k[0]; 
+//            String Mc = k[1]; 
+//            String Ks = k[2]; 
+//            String Ms = k[3]; 
+//            System.out.println("this is the Kc:" + Kc);
+//            System.out.println("this is the Mc:" + Mc);
+//            System.out.println("this is the Ks:" + Ks);
+//            System.out.println("this is the Ms:" + Ms);
             
-            BigInteger diffKeys = mes.multiply(ses).multiply(sig);
-            String stringofKeys = diffKeys.toString();
-           
-            if(stringofKeys.length()%8!=0)
-            {
-                switch (stringofKeys.length()%8) {
-                    case 7:
-                        stringofKeys+="0";
-                        break;
-                    case 6:
-                        stringofKeys+="00";
-                        break;
-                    case 5:
-                        stringofKeys+="000";
-                        break;
-                    case 4:
-                        stringofKeys+="0000";
-                        break;
-                    case 3:
-                        stringofKeys+="00000";
-                        break;
-                    case 2:
-                        stringofKeys+="000000";
-                        break;
-                    case 1:
-                        stringofKeys+="0000000";
-                        break;
-                    default:
-                        break;
-                }
-            }
-            String k [] = null;
-           
-            for(int i = 0; i<stringofKeys.length(); i+=2)
-            {
-                int j = 0;
-                k[j] = stringofKeys.substring(i, i+1);
-                j++;
-            }
-            
-            String Kc = k[0]; 
-            String Mc = k[1]; 
-            String Ks = k[2]; 
-            String Ms = k[3]; 
-            System.out.println("this is the Kc:" + Kc);
-            System.out.println("this is the Mc:" + Mc);
-            System.out.println("this is the Ks:" + Ks);
-            System.out.println("this is the Ms:" + Ms);
             outgoing.println("ACK");
             outgoing.flush();
         }
