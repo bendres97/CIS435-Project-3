@@ -81,8 +81,10 @@ public class ChatServer
             {
                 throw new Exception("Connected program is not a ChatClient!");
             }
+            String count = "";
+            String algo = "";
 
-            String ciphers = "ShiftCipher + RSA + MAC+ Digital Signature,PolyalphabeticCipher + RSA + Digital Signature + MAC ,SubsitutionCipher + RSA + Digital Signature + MAC";
+            String ciphers = "ShiftCipher + RSA + MAC+ Digital Signature,SubsitutionCipher + RSA + Digital Signature + MAC,PolyalphabeticCipher + RSA + Digital Signature + MAC";
 
             String[] parsing = ciphers.split(",");
 
@@ -93,17 +95,29 @@ public class ChatServer
                 {
                     if(parsing[i].equals(parsingIn[j]))
                     {
-                        messageOut = parsing[i];
+                        algo = parsing[i];
                         break;
                     }
                 }
             }
-            System.out.println("This is the different Ciphers that the Server has");
+          //  System.out.println("This is the different Ciphers that the Server has");
             for (int i = 0; i < parsing.length; i++)
             {
-                System.out.println(parsing[i]);
+                if(parsing[i].equals(algo))
+                {
+                    count = "1";
+                }
+                 if(parsing[i].equals(algo))
+                {
+                    count = "2";
+                }
+                  if(parsing[i].equals(algo))
+                {
+                    count = "3";
+                }
             }
 
+            messageOut = count;
             Random rng = new Random();
 
             BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
@@ -117,7 +131,7 @@ public class ChatServer
             //BEGIN HANDSHAKING HERE
             String msg = incoming.readLine();
             System.out.println("Received " + msg);
-            outgoing.println("ACK");
+            outgoing.println(messageOut);
             outgoing.flush();
         }
         catch (Exception e)
