@@ -101,8 +101,6 @@ public class ChatServer
                System.out.println(parsingIn[i]); 
             }
             
-            HashSet<String> set = new HashSet<>();
-
             for (int i = 0; i < parsing.length; i++)
 		{
 		for (int j = 0; j < parsingIn.length; j++)
@@ -114,20 +112,21 @@ public class ChatServer
 			}
 		}
           
+            BigInteger cipher = new BigInteger(algo);
             Random rng = new Random();
 
             BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
 
-            Packet pk = new Packet();
+            RSA rsa = new RSA();
+            Packet pk = new Packet(servNonce, cipher,rsa.getPrivateKey().getEXP().add(rsa.getPrivateKey().getN()));
 
-            pk.setSessionKey(servNonce);
+            
 
             System.out.println("Connected.  Waiting for the first message.");
             
-            RSA rsa = new RSA();
-            outgoing.println(algo + " " + rsa.getPrivateKey() + " "+ rsa.getPublicKey());
-            outgoing.println(" Private key: " + rsa.getPrivateKey());
-            outgoing.println(" Public key: " + rsa.getPublicKey());
+            
+            outgoing.print(pk);
+         //   outgoing.println(" Public key: " + rsa.getPublicKey());
             outgoing.println("ACK");
             outgoing.flush();
         }
