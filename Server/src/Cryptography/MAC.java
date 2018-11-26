@@ -2,85 +2,62 @@ package Cryptography;
 
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
 
 /**
-* Uses MAC to check the integrity of a message
-* 
-* Solves CIS435+535 Project #1 Cryptography
-*
-* @author Andrew Bradley
-* 		
-* @version 1.01 09-30-2018
-*/
-public class MAC implements MACADT {
+ * Message Authentication code stores a hash and ASCII converter for use with
+ * authentication and integrity checks.
+ *
+ * @author Bryan Endres ID: 8
+ * @date 9-30-2018
+ */
+public class MAC implements MACADT
+{
 
-	private BigInteger hash;
-	private final int mod = 13;
+    private final BigInteger HASH;
+    private final static AsciiConverter ASCII = new AsciiConverter();
+    ;
+    private final static int HASH_KEY = 128;
 
-	/**
-	 * The constructor for MAC
-	 */
-	public MAC() {
-		//establishes the mod
-		hash = new BigInteger(String.valueOf(mod));
-	}
+    public MAC()
+    {
+        HASH = new BigInteger(String.valueOf(HASH_KEY));
+    }
 
-	/**
-	 * This is the encrypt for MAC
-	 * @param message
-	 * 		Biginteger that is a message from the tester
-	 * @param secret
-	 * 		BigInteger that is the secret from the tester
-	 * @return a biginteger that is manipulated by using the char ascii table
-	 * 
-	 */
-	@Override
-	public BigInteger mACEncrypt(BigInteger message, BigInteger secret) {
-		AsciiConverter asciiConverter = new AsciiConverter();
+    @Override
+    public BigInteger authenticate(String msg, String secret)
+    {
+        //Concatenate msg and secret and convert to BigInteger 
+        BigInteger concatenation = ASCII.StringtoBigInt(secret + msg);
 
-		String msg = asciiConverter.BigIntToString(message);
-		String sec = asciiConverter.BigIntToString(secret);
+        //Mod the concatenation by the hash value
+        BigInteger hashedValue = concatenation.mod(HASH);
 
-		//Concatenates the message and the secret
-		String con = sec + msg;
-		//Hashing the message with the secret
-		BigInteger concatenate = asciiConverter.StringtoBigInt(con);
-	
-		
-		BigInteger moding = concatenate.mod(hash);
-		
-		//Converting moding using ascii converter
-		
-		BigInteger big = asciiConverter.StringtoBigInt((char) moding.intValue() + msg);
+        //Concatenate the new hash onto the string
+        BigInteger mac = ASCII.StringtoBigInt((char) hashedValue.intValue() + msg);
 
-		return big;
-	}
-	/**
-	 * This is the MACChecker for MAC
-	 * 
-	 * @param message
-	 * 		takes the message fromt the tester
-	 * @param secret
-	 * 		takes the secret from  the tester
-	 * 
-	 * @return a boolean to see if macencrypt equals the message
-	 */
-	@Override
-	public boolean mACChecker(BigInteger message, BigInteger secret) {
-		
-		AsciiConverter asciiConverter = new AsciiConverter();
-				
-		String msg = asciiConverter.BigIntToString(message);
-		//takes out the hash from message
-		msg = msg.substring(1);
+        return mac;
+    }
+    
+    public BigInteger authenticate(BigInteger msg, BigInteger secret)
+    {
+        String msgString = ASCII.BigIntToString(msg);
+        String secretString = ASCII.BigIntToString(secret);
+        
+        return authenticate(msgString, secretString);
+    }
 
-		//places the hash into BigInteger form to encrypt MAC
-		BigInteger MACEncrypt = mACEncrypt(asciiConverter.StringtoBigInt(msg), secret);
+    @Override
+    public boolean checkIntegrity(BigInteger msg, String secret)
+    {
+        //Convert the message to a string and drop off the hashed secret
+        String message = ASCII.BigIntToString(msg);
+        message = message.substring(1); //Drop off secret on front of message
 
-		return MACEncrypt.equals(message);
+        //Call authenticate to rehash the message
+        BigInteger check = authenticate(message, secret);
 
-	}
+        //Check the integrity of the received msg
+        return check.equals(msg);
+    }
 
 }

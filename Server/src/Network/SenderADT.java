@@ -62,5 +62,5 @@ public interface SenderADT
      *
      * @return The secret
      */
-    public BigInteger getSecret();
+    public String getSecret();
 }

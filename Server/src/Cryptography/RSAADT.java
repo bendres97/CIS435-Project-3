@@ -29,7 +29,7 @@ public interface RSAADT
      * @return The plaintext message.
      */
     public BigInteger Decrypt(BigInteger cipherIn);
-    
+
     /**
      * Returns the public key pair.
      *
@@ -43,6 +43,5 @@ public interface RSAADT
      * @return The private key pair
      */
     public RSAKey getPrivateKey();
-    
 
 }
