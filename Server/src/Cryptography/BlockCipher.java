@@ -1,6 +1,7 @@
 package Cryptography;
 
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ public class BlockCipher implements BlockCipherADT
     @Override
     public String Encrypt(String input)
     {
+        
         //Convert the input String to binary
         //Adapted from https://stackoverflow.com/questions/917163/convert-a-string-like-testing123-to-binary-in-java
         byte[] message = input.getBytes();

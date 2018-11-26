@@ -1,5 +1,7 @@
 package Cryptography;
 
+import java.math.BigInteger;
+
 
 /**
  *ADT for Block Cipher
