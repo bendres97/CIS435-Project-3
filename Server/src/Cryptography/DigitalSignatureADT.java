@@ -2,30 +2,27 @@ package Cryptography;
 
 
 /**
-*
-*The interface for Digital Signature
-*
-* Checks the digital signature of a the user who was sending the message
-* It was to ensure authentication 
-* 
-* Solves CIS435+535 Project #1 Cryptography
-*
-* @author Andrew Bradley
-* 		
-* @version 1.01 09-30-2018
-*/
-import java.math.BigInteger;
-
-import javafx.util.Pair;
-
-/**
-Interface that abstract methods to be 
-performed on a Digital Signature
-@author Andrew Bradley
-@version 1.00 	2018-09-18
-*/
+ * ADT for Digital Signatures
+ *
+ * @author Bryan Endres ID: 8
+ * @date 9-30-2018
+ */
 public interface DigitalSignatureADT
 {
-	public Pair<BigInteger, BigInteger> encryptMessageDigest(BigInteger message);	
-	public boolean compare(Pair <BigInteger, BigInteger> pair); 
+
+    /**
+     * Encrypts the supplied message using the supplied modulus and public key.
+     *
+     * @param msg String representation of the plaintext message to encrypt.
+     * @return The encrypted digital signature.
+     */
+    public Signature sign(String msg);
+
+    /**
+     * authenticate the Digital Signature
+     *
+     * @param signature The Digital Signature to check
+     * @return True if the signature is valid
+     */
+    public boolean authenticate(Signature signature);
 }

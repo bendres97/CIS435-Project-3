@@ -105,7 +105,7 @@ public class SecureMessageSystem
                     //ShiftCipher + RSA + MAC+ Digital Signature + CA
                     case CASE1:
                         ShiftCipher shiftCipher = new ShiftCipher();
-                        result = ASCII.BigIntToString(shiftCipher.decrypt(decMsg, ASCII.StringtoBigInt(amy.getSecret())));
+                        result = ASCII.BigIntToString(shiftCipher.decrypt(decMsg, amy.getSecret()));
                         break;
 
                     //SubsitutionCipher + RSA + Digital Signature + MAC + CA
