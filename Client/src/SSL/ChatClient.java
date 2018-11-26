@@ -76,7 +76,13 @@ class ChatClient
             {
                 throw new IOException("Connected program is not CLChat!");
             }
-            System.out.println("Connected.  Enter your first message.");
+            System.out.println("Connected. Initiating Handshake");
+
+            //BEGIN HANDSHAKING HERE
+            outgoing.println("Handshake");
+            outgoing.flush();
+            String msg = incoming.readLine();
+            System.out.println("Received " + msg);
         }
         catch (Exception e)
         {

@@ -1,6 +1,5 @@
 package SSL;
 
-import Cryptography.RSA;
 import Network.Packet;
 import java.io.*;
 import java.math.BigInteger;
@@ -77,31 +76,36 @@ public class ChatServer
             outgoing.println(HANDSHAKE);  // Send handshake to client.
             outgoing.flush();
             messageIn = incoming.readLine();  // Receive handshake from client.
-            
+
             if (!HANDSHAKE.equals(messageIn))
             {
                 throw new Exception("Connected program is not a ChatClient!");
             }
-            
+
             String algorithms = "Shift Cipher + RSA + MAC,Polyalphabetic Cipher + RSA + MAC,Subsitution Cipher + RSA + MAC";
             String[] parsing = algorithms.split(",");
 
             System.out.println("This is the different Ciphers that the Server has");
-            for(int i = 0; i <parsing.length; i++)
+            for (int i = 0; i < parsing.length; i++)
             {
-              System.out.println(parsing[i]);
+                System.out.println(parsing[i]);
             }
-            
-            
+
             Random rng = new Random();
 
             BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
-          
+
             Packet pk = new Packet();
-          
+
             pk.setSessionKey(servNonce);
-            
+
             System.out.println("Connected.  Waiting for the first message.");
+
+            //BEGIN HANDSHAKING HERE
+            String msg = incoming.readLine();
+            System.out.println("Received " + msg);
+            outgoing.println("ACK");
+            outgoing.flush();
         }
         catch (Exception e)
         {
@@ -139,7 +143,7 @@ public class ChatServer
                 System.out.println("RECEIVED:  " + messageIn);
                 System.out.print("SEND:      ");
                 messageOut = userInput.readLine();
-                messageOut+= " ";
+                messageOut += " ";
                 if (messageOut.equalsIgnoreCase("quit"))
                 {
                     // User wants to quit.  Inform the other side
