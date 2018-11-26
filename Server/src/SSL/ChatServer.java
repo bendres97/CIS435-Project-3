@@ -83,8 +83,11 @@ public class ChatServer
             {
                 throw new Exception("Connected program is not a ChatClient!");
             }
+            /////////////////////////////////////////////////////
+            //Start of handshake////////////////////////////////
+            ////////////////////////////////////////////////////
             
-            //Start of handshake
+            //Handshake portion 1
             String msg = incoming.readLine();
             System.out.println("Received " + msg);
             
@@ -112,6 +115,7 @@ public class ChatServer
 			}
 		}
           
+            
             BigInteger cipher = new BigInteger(algo);
             Random rng = new Random();
 
@@ -126,15 +130,65 @@ public class ChatServer
             String keys = (stringPrivateKey + stringPublicKey);
             BigInteger bigKey = new BigInteger (keys);
            // System.out.println(bigKey);
-            Packet pk = new Packet(servNonce, cipher, bigKey);
-
+            Packet pk1 = new Packet(servNonce, cipher, bigKey);
             
 
             System.out.println("Connected.  Waiting for the first message.");
             
             
-            outgoing.print(pk);
-         //   outgoing.println(" Public key: " + rsa.getPublicKey());
+            outgoing.print(pk1);
+            
+            //handshake portion 2
+            BigInteger session2 = BigInteger.valueOf(incoming.read());
+            BigInteger message2 = BigInteger.valueOf(incoming.read());
+            BigInteger signature2 = BigInteger.valueOf(incoming.read());
+            Packet clientPK2 = new Packet(session2, message2, signature2);
+            BigInteger mes = clientPK2.getMessage();
+            BigInteger ses =  clientPK2.getSessionKey();
+            BigInteger sig = clientPK2.getSignature();
+            
+            BigInteger diffKeys = mes.multiply(ses).multiply(sig);
+            String stringofKeys = diffKeys.toString();
+           
+            if(stringofKeys.length()%8!=0)
+            {
+                switch (stringofKeys.length()%8) {
+                    case 7:
+                        stringofKeys+="0";
+                        break;
+                    case 6:
+                        stringofKeys+="00";
+                        break;
+                    case 5:
+                        stringofKeys+="000";
+                        break;
+                    case 4:
+                        stringofKeys+="0000";
+                        break;
+                    case 3:
+                        stringofKeys+="00000";
+                        break;
+                    case 2:
+                        stringofKeys+="000000";
+                        break;
+                    case 1:
+                        stringofKeys+="0000000";
+                        break;
+                    default:
+                        break;
+                }
+            }
+            String k [] = null;
+           
+            for(int i = 0; i<stringofKeys.length(); i+=2)
+            {
+                int j = 0;
+                k[j] = stringofKeys.substring(i, i+1);
+                j++;
+            }
+            
+            
+            
             outgoing.println("ACK");
             outgoing.flush();
         }
