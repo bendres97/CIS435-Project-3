@@ -84,10 +84,10 @@ public class ChatServer
             String count = "";
             String algo = "";
 
-            String ciphers = "ShiftCipher + RSA + MAC+ Digital Signature,SubsitutionCipher + RSA + Digital Signature + MAC,PolyalphabeticCipher + RSA + Digital Signature + MAC";
+            String ciphers = "1,4,5";
 
             String[] parsing = ciphers.split(",");
-
+            
             String [] parsingIn = messageIn.split(",");
             for(int i = 0; i< parsing.length; i++)
             {
@@ -96,28 +96,15 @@ public class ChatServer
                     if(parsing[i].equals(parsingIn[j]))
                     {
                         algo = parsing[i];
-                        break;
+                        System.out.println(algo);
+                        
                     }
                 }
             }
           //  System.out.println("This is the different Ciphers that the Server has");
-            for (int i = 0; i < parsing.length; i++)
-            {
-                if(parsing[i].equals(algo))
-                {
-                    count = "1";
-                }
-                 if(parsing[i].equals(algo))
-                {
-                    count = "2";
-                }
-                  if(parsing[i].equals(algo))
-                {
-                    count = "3";
-                }
-            }
+           
 
-            messageOut = count;
+            messageOut = "1";
             Random rng = new Random();
 
             BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
@@ -132,6 +119,7 @@ public class ChatServer
             String msg = incoming.readLine();
             System.out.println("Received " + msg);
             outgoing.println(messageOut);
+            outgoing.println("ACK");
             outgoing.flush();
         }
         catch (Exception e)
