@@ -122,7 +122,8 @@ public class ChatServer
             BigInteger privateKey = rsa.getPrivateKey().getEXP().add(rsa.getPrivateKey().getN());
             BigInteger publicKey =  rsa.getPublicKey().getEXP().add(rsa.getPublicKey().getN());
             String keys = privateKey + "," +publicKey;
-            BigInteger bigKey = new BigInteger (keys);
+            //BigInteger bigKey = new BigInteger (keys);
+           // System.out.println(bigKey);
             Packet pk = new Packet(servNonce, cipher, bigKey);
 
             
@@ -171,7 +172,6 @@ public class ChatServer
                 System.out.println("RECEIVED:  " + messageIn);
                 System.out.print("SEND:      ");
                 messageOut = userInput.readLine();
-                messageOut += " ";
                 if (messageOut.equalsIgnoreCase("quit"))
                 {
                     // User wants to quit.  Inform the other side
