@@ -82,9 +82,22 @@ public class ChatServer
                 throw new Exception("Connected program is not a ChatClient!");
             }
 
-            String algorithms = "Shift Cipher + RSA + MAC,Polyalphabetic Cipher + RSA + MAC,Subsitution Cipher + RSA + MAC";
-            String[] parsing = algorithms.split(",");
+            String ciphers = "ShiftCipher + RSA + MAC+ Digital Signature,PolyalphabeticCipher + RSA + Digital Signature + MAC ,SubsitutionCipher + RSA + Digital Signature + MAC";
 
+            String[] parsing = ciphers.split(",");
+
+            String [] parsingIn = messageIn.split(",");
+            for(int i = 0; i< parsing.length; i++)
+            {
+                for(int j = 0; j< parsingIn.length; j++)
+                {
+                    if(parsing[i].equals(parsingIn[j]))
+                    {
+                        messageOut = parsing[i];
+                        break;
+                    }
+                }
+            }
             System.out.println("This is the different Ciphers that the Server has");
             for (int i = 0; i < parsing.length; i++)
             {
