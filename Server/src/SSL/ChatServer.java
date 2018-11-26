@@ -1,9 +1,11 @@
 package SSL;
 
+import Cryptography.RSA;
 import Network.Packet;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -81,30 +83,37 @@ public class ChatServer
             {
                 throw new Exception("Connected program is not a ChatClient!");
             }
-            String count = "";
+            
+            //Start of handshake
+            String msg = incoming.readLine();
+            System.out.println("Received " + msg);
+            
             String algo = "";
 
+            //Picks what cipher spec to use
             String ciphers = "1,4,5";
 
             String[] parsing = ciphers.split(",");
             
-            String [] parsingIn = messageIn.split(",");
-            for(int i = 0; i< parsing.length; i++)
+            String [] parsingIn = msg.split(",");
+            for(int i = 0; i< parsingIn.length; i++)
             {
-                for(int j = 0; j< parsingIn.length; j++)
-                {
-                    if(parsing[i].equals(parsingIn[j]))
-                    {
-                        algo = parsing[i];
-                        System.out.println(algo);
-                        
-                    }
-                }
+               System.out.println(parsingIn[i]); 
             }
-          //  System.out.println("This is the different Ciphers that the Server has");
-           
+            
+            HashSet<String> set = new HashSet<>();
 
-            messageOut = "1";
+            for (int i = 0; i < parsing.length; i++)
+		{
+		for (int j = 0; j < parsingIn.length; j++)
+			{
+				if(parsing[i].equals(parsingIn[j]))
+				{
+                                    algo = parsing[i];
+				}
+			}
+		}
+          
             Random rng = new Random();
 
             BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
@@ -114,11 +123,11 @@ public class ChatServer
             pk.setSessionKey(servNonce);
 
             System.out.println("Connected.  Waiting for the first message.");
-
-            //BEGIN HANDSHAKING HERE
-            String msg = incoming.readLine();
-            System.out.println("Received " + msg);
-            outgoing.println(messageOut);
+            
+            RSA rsa = new RSA();
+            outgoing.println(algo + " " + rsa.getPrivateKey() + " "+ rsa.getPublicKey());
+            outgoing.println(" Private key: " + rsa.getPrivateKey());
+            outgoing.println(" Public key: " + rsa.getPublicKey());
             outgoing.println("ACK");
             outgoing.flush();
         }
