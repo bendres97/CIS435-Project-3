@@ -127,10 +127,9 @@ public class ChatServer
             BigInteger publicKey =  rsa.getPublicKey().getEXP().add(rsa.getPublicKey().getN());
             String stringPrivateKey = privateKey.toString();
             String stringPublicKey = publicKey.toString();
-            String keys = (stringPrivateKey + stringPublicKey);
-            BigInteger bigKey = new BigInteger (keys);
+            
            // System.out.println(bigKey);
-            Packet pk1 = new Packet(servNonce, cipher, bigKey);
+            Packet pk1 = new Packet(servNonce, cipher, publicKey);
             
 
             System.out.println("Connected.  Waiting for the first message.");
@@ -187,8 +186,14 @@ public class ChatServer
                 j++;
             }
             
-            
-            
+            String Kc = k[0]; 
+            String Mc = k[1]; 
+            String Ks = k[2]; 
+            String Ms = k[3]; 
+            System.out.println("this is the Kc:" + Kc);
+            System.out.println("this is the Mc:" + Mc);
+            System.out.println("this is the Ks:" + Ks);
+            System.out.println("this is the Ms:" + Ms);
             outgoing.println("ACK");
             outgoing.flush();
         }
