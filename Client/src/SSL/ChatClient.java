@@ -79,7 +79,7 @@ class ChatClient
             System.out.println("Connected. Initiating Handshake");
 
             //BEGIN HANDSHAKING HERE
-            outgoing.println("Handshake");
+            outgoing.println("1,2,3");
             outgoing.flush();
             String msg = incoming.readLine();
             System.out.println("Received " + msg);
