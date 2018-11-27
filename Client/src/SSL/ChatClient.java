@@ -561,4 +561,4 @@ class ChatClient
         return result;
     }
 
-} //end class ChatClient
+}
