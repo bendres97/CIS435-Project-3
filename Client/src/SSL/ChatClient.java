@@ -434,20 +434,23 @@ class ChatClient
      *
      * @author Bryan Endres
      * @author Andrew Bradley
-     * @param Message, test case, Kc, and RSAKey server public key
+     * @param message The message to convert
+     * @param testCase the case to be used for authentication
+     * @param Kc The secret key to use
+     * @param serverPublicKey The public key for the server
      * @return a packet
      *
      */
     public static Packet getMessagePacket(String message, int testCase, BigInteger Kc, RSAKey serverPublicKey)
     {
-        BigInteger msg = ASCII.StringtoBigInt(message);
         String secret = ASCII.BigIntToString(Kc);
+        BigInteger msg = ASCII.StringtoBigInt(message);
         switch (testCase)
         {
             //ShiftCipher + RSA + MAC
             case CASE1:
                 ShiftCipher shiftCipher = new ShiftCipher();
-                msg = shiftCipher.Encrypt(msg, ASCII.StringtoBigInt(secret));
+                msg = shiftCipher.Encrypt(msg, Kc);
                 break;
 
             //SubsitutionCipher + RSA + MAC
@@ -480,7 +483,7 @@ class ChatClient
                 return null;
         }
 
-        //Calculating the MAC
+        //MAC
         message = ASCII.BigIntToString(msg);
         message = ASCII.BigIntToString(MAC.authenticate(message, secret));
 
@@ -494,9 +497,9 @@ class ChatClient
     /**
      * Check the integrity of the message, only decrypt if MAC is authentic.
      *
-     * @param packet
-     * @param Ks
-     * @param testCase
+     * @param packet The packet to retrieve the message from
+     * @param Ks The client's secret
+     * @param testCase The case to use for decryption
      * @return a string that gets printed out from either the client and server
      */
     public static String getMessage(Packet packet, BigInteger Ks, int testCase)
@@ -516,32 +519,32 @@ class ChatClient
             System.out.println("Message is authentic");
             switch (testCase)
             {
-                //ShiftCipher + RSA + MAC + Digital Signature + CA
+                //ShiftCipher + RSA + MAC
                 case CASE1:
                     ShiftCipher shiftCipher = new ShiftCipher();
-                    result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, ASCII.StringtoBigInt(secret)));
+                    result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, Ks));
                     break;
 
-                //SubsitutionCipher + RSA + Digital Signature + MAC + CA
+                //SubsitutionCipher + RSA + MAC
                 case CASE2:
                     SubstitutionCipher subCipher = new SubstitutionCipher();
                     result = subCipher.Decrypt(ASCII.BigIntToString(decMsg), SUB_KEY);
                     break;
 
-                //PolyalphabeticCipher + RSA + MAC + CA
+                //PolyalphabeticCipher + RSA + MAC
                 case CASE3:
                     PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
                     result = polyCipher.Decrypt(ASCII.BigIntToString(decMsg), secret);
                     break;
 
-                //CBC + RSA + MAC + Digital Signature + CA
+                //CBC + RSA + MAC
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
                     result = cbc.Decrypt(ASCII.BigIntToString(decMsg), IV);
                     result = result.substring(1);   //Remove IV at front
                     break;
 
-                //Block Cipher + RSA + MAC + Digital Signature + CA
+                //Block Cipher + RSA + MAC
                 case CASE5:
                     BlockCipher block = new BlockCipher();
                     result = block.Decrypt(ASCII.BigIntToString(decMsg));

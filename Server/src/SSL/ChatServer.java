@@ -131,7 +131,7 @@ public class ChatServer
             //Client suports the following cipher suits
             System.out.println("Server supports the following cipher suites:");
             System.out.println("Case 1: ShiftCipher + RSA + MAC"
-                    + "\n\t" + "Case 2: PolyalphabeticCipher + RSAMAC"
+                    + "\n\t" + "Case 2: PolyalphabeticCipher + RSA + MAC"
                     + "\n\t" + "Case 5: Block Cipher + RSA + MAC");
             System.out.println();
 
@@ -449,7 +449,10 @@ public class ChatServer
      *
      * @author Bryan Endres
      * @author Andrew Bradley
-     * @param Message, test case, Kc, and RSAKey server public key
+     * @param message The message to convert
+     * @param testCase the case to be used for authentication
+     * @param Ks The secret key to use
+     * @param clientPublicKey The public key for the client
      * @return a packet
      *
      */
@@ -459,31 +462,31 @@ public class ChatServer
         BigInteger msg = ASCII.StringtoBigInt(message);
         switch (testCase)
         {
-            //ShiftCipher + RSA + MAC+ Digital Signature + CA
+            //ShiftCipher + RSA + MAC
             case CASE1:
                 ShiftCipher shiftCipher = new ShiftCipher();
-                msg = shiftCipher.Encrypt(msg, ASCII.StringtoBigInt(secret));
+                msg = shiftCipher.Encrypt(msg, Ks);
                 break;
 
-            //SubsitutionCipher + RSA + Digital Signature + MAC + CA
+            //SubsitutionCipher + RSA + MAC
             case CASE2:
                 SubstitutionCipher subCipher = new SubstitutionCipher();
                 msg = ASCII.StringtoBigInt(subCipher.Encrypt(message, SUB_KEY));
                 break;
 
-            //PolyalphabeticCipher + RSA +Digital Signature + MAC + CA
+            //PolyalphabeticCipher + RSA + MAC
             case CASE3:
                 PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
                 msg = ASCII.StringtoBigInt(polyCipher.Encrypt(message, secret));
                 break;
 
-            //CBC + RSA + MAC + Digital Signature + CA
+            //CBC + RSA + MAC
             case CASE4:
                 CipherBlockChain cbc = new CipherBlockChain();
                 msg = ASCII.StringtoBigInt(cbc.Encrypt(message, IV));
                 break;
 
-            //Block Cipher + RSA + MAC + Digital Signature + CA
+            //Block Cipher + RSA + MAC
             case CASE5:
                 BlockCipher block = new BlockCipher();
                 msg = ASCII.StringtoBigInt(block.Encrypt(message));
@@ -509,9 +512,9 @@ public class ChatServer
     /**
      * Check the integrity of the message, only decrypt if MAC is authentic.
      *
-     * @param packet
-     * @param Ks
-     * @param testCase
+     * @param packet The packet to retrieve the message from
+     * @param Kc The client's secret
+     * @param testCase The case to use for decryption
      * @return a string that gets printed out from either the client and server
      */
     public static String getMessage(Packet packet, BigInteger Kc, int testCase)
@@ -531,32 +534,32 @@ public class ChatServer
             System.out.println("Message is authentic");
             switch (testCase)
             {
-                //ShiftCipher + RSA + MAC + Digital Signature + CA
+                //ShiftCipher + RSA + MAC
                 case CASE1:
                     ShiftCipher shiftCipher = new ShiftCipher();
-                    result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, ASCII.StringtoBigInt(secret)));
+                    result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, Kc));
                     break;
 
-                //SubsitutionCipher + RSA + Digital Signature + MAC + CA
+                //SubsitutionCipher + RSA + MAC
                 case CASE2:
                     SubstitutionCipher subCipher = new SubstitutionCipher();
                     result = subCipher.Decrypt(ASCII.BigIntToString(decMsg), SUB_KEY);
                     break;
 
-                //PolyalphabeticCipher + RSA + MAC + CA
+                //PolyalphabeticCipher + RSA + MAC
                 case CASE3:
                     PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
                     result = polyCipher.Decrypt(ASCII.BigIntToString(decMsg), secret);
                     break;
 
-                //CBC + RSA + MAC + Digital Signature + CA
+                //CBC + RSA + MAC
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
                     result = cbc.Decrypt(ASCII.BigIntToString(decMsg), IV);
                     result = result.substring(1);   //Remove IV at front
                     break;
 
-                //Block Cipher + RSA + MAC + Digital Signature + CA
+                //Block Cipher + RSA + MAC
                 case CASE5:
                     BlockCipher block = new BlockCipher();
                     result = block.Decrypt(ASCII.BigIntToString(decMsg));
