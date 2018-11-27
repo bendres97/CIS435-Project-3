@@ -5,6 +5,7 @@ import Network.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -50,8 +51,6 @@ public class ChatServer
     static final Random RAND = new Random();
     static final BigInteger NONCE = BigInteger.valueOf(Math.abs(RAND.nextInt()));
     static final AsciiConverter ASCII = new AsciiConverter();
-    static final Sender SENDER = new Sender();
-    static final Receiver RECEIVER = new Receiver();
     static final String[] CIPHERS =
     {
         "1", "3", "5"
@@ -59,6 +58,7 @@ public class ChatServer
     static RSA RSA = new RSA();
     static RSAKey PUBLIC_KEY = RSA.getPublicKey();
     static RSAKey PRIVATE_KEY = RSA.getPrivateKey();
+    static final ArrayList<Packet> PACKETS = new ArrayList<>();
 
     public static void main(String[] args)
     {
@@ -103,6 +103,7 @@ public class ChatServer
             //Receive cipher suite
             String packetString = incoming.readLine();
             Packet packet = getPacket(packetString);
+            PACKETS.add(packet);
             System.out.println("Received:\t" + packetString);
             System.out.println("Packet:\t" + packet);
 
@@ -131,24 +132,76 @@ public class ChatServer
             }
 
             //Encrypt NONCE and send choice back along with public key
-            BigInteger encryptedNonce = PRIVATE_KEY.crypt(packet.getSessionKey());
+            BigInteger clientNonce = packet.getSessionKey();
+            BigInteger encryptedNonce = PRIVATE_KEY.crypt(clientNonce);
             String keyString = keyToString(PUBLIC_KEY);
             String nonceString = encryptedNonce.toString();
             BigInteger message = ASCII.StringtoBigInt(choice + ';' + nonceString + ';' + keyString);
             packet = new Packet(NONCE, message);
+            PACKETS.add(packet);
+            outgoing.println(preparePacket(packet));
+            outgoing.flush();
+
+            //Receive Pre Master Secret
+            String pmsString = incoming.readLine();
+            System.out.println("Received: " + pmsString);
+
+            packet = getPacket(pmsString);
+            PACKETS.add(packet);
+            BigInteger pmsInt = packet.getMessage();
+            BigInteger pms = PRIVATE_KEY.crypt(pmsInt);
+
+            System.out.println("PMS: " + pms);
+
+            //Create Encryption Keys
+            BigInteger encryptionBase = pms.multiply(NONCE).multiply(clientNonce);
+            int factorInt = 2;
+            BigInteger factor = BigInteger.valueOf(factorInt);
+            BigInteger Kc = encryptionBase.divide(factor);
+            BigInteger Mc = Kc.pow(factorInt);
+            BigInteger Ks = Mc.multiply(factor);
+            BigInteger Ms = Ks.nextProbablePrime();
+
+            System.out.println("Product:\t" + encryptionBase);
+            System.out.println("Kc:\t" + Kc);
+            System.out.println("Mc:\t" + Mc);
+            System.out.println("Ks:\t" + Ks);
+            System.out.println("Ms:\t" + Ms);
+            
+            //Calculate MAC values
+            BigInteger packetSum = BigInteger.ZERO;
+            for(Packet pkt : PACKETS)
+            {
+                packetSum = packetSum.add(pkt.getHashSum());
+            }
+            
+            BigInteger MACc = packetSum.mod(Mc);
+            BigInteger MACs = packetSum.mod(Ms);
+            
+            System.out.println("MACc: " + MACc);
+            System.out.println("MACs: " + MACs);
+            
+            //Send MACc
+            packet = new Packet(NONCE, MACs);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
             
-            //Receive Pre Master Secret
+            //Receive MACc
+            String MACc_rec = incoming.readLine();
+            packet = getPacket(MACc_rec);
+            System.out.println("Received MACc: " + packet.getMessage());
             
-            String pmsString = incoming.readLine();
-            System.out.println("Received: " + pmsString);
+            if(MACc.equals(packet.getMessage()))
+            {
+                System.out.println("MAC check is equal. Secure connection established.");
+            }
             
-            packet = getPacket(pmsString);
-            BigInteger pmsInt = packet.getMessage();
-            BigInteger pms = PRIVATE_KEY.crypt(pmsInt);
-            
-            System.out.println("PMS: " + pms);
+            else
+            {
+                System.out.println("ERROR: Insecure connection. Aborting");
+                connection.close();
+                System.exit(1);
+            }
 
         }
         catch (Exception e)

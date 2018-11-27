@@ -138,4 +138,9 @@ public class Packet implements PacketADT
 
         return result;
     }
+    
+    public BigInteger getHashSum()
+    {
+        return message.add(signature).add(sessionKey);
+    }
 }
