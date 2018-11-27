@@ -20,6 +20,10 @@ import java.util.Random;
  * message. Note that the first character of any string sent over the connection
  * must be 0 or 1; this character is interpreted as a command for security
  * purpose.
+ * 
+ * @author Andrew Bradley
+ * @author Bryan Endres
+ * 
  */
 class ChatClient
 {
