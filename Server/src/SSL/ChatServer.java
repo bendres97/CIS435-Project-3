@@ -22,6 +22,9 @@ import java.util.Random;
  * connection by entering the string "quit" when prompted for a message. Note
  * that the first character of any string sent over the connection must be 0 or
  * 1; this character is interpreted as a command for security purpose
+ * 
+ * @author Bryan Endres
+ * @author Andrew Bradleys
  */
 public class ChatServer
 {
