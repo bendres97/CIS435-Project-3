@@ -282,7 +282,6 @@ class ChatClient
                     System.out.println("This is the packet that is taken in: " + messageIn);
                     packet = getPacket(messageIn);
                     recMsg = getMessage(packet, Ks, Integer.valueOf(choice));
-                    System.out.println("This is the received message from the packet: " +recMsg );
                 }
                 System.out.println("RECEIVED:  " + recMsg);
                 System.out.println();
