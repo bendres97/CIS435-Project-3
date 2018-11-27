@@ -86,7 +86,6 @@ class ChatClient
 
         /* Open a connetion to the server.  Create streams for 
          communication and exchange the handshake. */
-        
         BigInteger Kc;
         BigInteger Ks;
         String choice;
@@ -110,12 +109,12 @@ class ChatClient
             //BEGIN HANDSHAKING HERE
             //Send Cipher Suite
             String ciphers = "1,2,3";
-            System.out.println("Here are the ciphers that Server has: ");
-            System.out.println("Case 1: ShiftCipher + RSA + MAC+ Digital Signature" 
-                    + "\n" +  "Case 2: SubstitutionCipher + RSA + Digital Signature + MAC" 
-                    + "\n" + "Case 3: PolyalphabeticCipher + RSA + Digital Signature + MAC");
+            System.out.println("Client supports the following cipher suites:");
+            System.out.println("\tCase 1: ShiftCipher + RSA + MAC"
+                    + "\n\t" + "Case 2: SubstitutionCipher + RSA + MAC"
+                    + "\n\t" + "Case 3: PolyalphabeticCipher + RSA + MAC");
             System.out.println();
-            
+
             String publicKeyString = keyToString(PUBLIC_KEY);
             String ciphers_Key = ciphers + ';' + publicKeyString;
             BigInteger ckInt = ASCII.StringtoBigInt(ciphers_Key);
@@ -133,7 +132,7 @@ class ChatClient
 
             System.out.println("Received: " + packetString);
             System.out.println();
-            
+
             String[] message = ASCII.BigIntToString(messageInt).split(";");
             choice = message[0];
             String nonceString = message[1];
@@ -145,7 +144,7 @@ class ChatClient
             System.out.println("Encrypted Nonce: " + nonceString);
             System.out.println("Key: " + serverPublicKey.toString());
             System.out.println();
-            
+
             //Verify Nonce
             BigInteger encryptedNonce = new BigInteger(nonceString);
             BigInteger nonce = serverPublicKey.crypt(encryptedNonce);
@@ -187,7 +186,7 @@ class ChatClient
             System.out.println("Ks:\t" + Ks);
             System.out.println("Ms:\t" + Ms);
             System.out.println();
-            
+
             //Calculate MAC values
             BigInteger packetSum = BigInteger.ZERO;
             for (Packet pkt : PACKETS)
@@ -201,7 +200,7 @@ class ChatClient
             System.out.println("MACc: " + MACc);
             System.out.println("MACs: " + MACs);
             System.out.println();
-            
+
             //Send MACc
             packet = new Packet(NONCE, MACc);
             outgoing.println(preparePacket(packet));
@@ -212,7 +211,7 @@ class ChatClient
             packet = getPacket(MACs_rec);
             System.out.println("Received MACs: " + packet.getMessage());
             System.out.println();
-            
+
             if (MACs.equals(packet.getMessage()))
             {
                 System.out.println("MAC check is equal. Secure connection established.");
@@ -239,6 +238,38 @@ class ChatClient
          After that,  messages alternate strictly back and forth. */
         try
         {
+            //Randomly create IV
+            Random rand = new Random();
+            String iv = "";
+            for (int n = 0; n < 3; n++)
+            {
+                iv += rand.nextBoolean() ? "1" : "0";
+            }
+
+            IV = iv;
+
+            //Creates Substitution Key
+            char[] substitutionKey = new char[128];
+            for (int n = 0; n < substitutionKey.length; n++)
+            {
+                substitutionKey[n] = (char) n;
+            }
+
+            //Randomly shuffle the array.
+            Random shuffler = new Random();
+            for (int n = 0; n < 10000; n++)
+            {
+                int index1 = shuffler.nextInt(substitutionKey.length);
+                int index2 = shuffler.nextInt(substitutionKey.length);
+
+                //Swap
+                char temp = substitutionKey[index1];
+                substitutionKey[index1] = substitutionKey[index2];
+                substitutionKey[index2] = temp;
+            }
+
+            SUB_KEY = substitutionKey;
+
             userInput = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("NOTE: Enter 'quit' to end the program.\n");
             while (true)
@@ -255,7 +286,7 @@ class ChatClient
                     System.out.println("Connection closed.");
                     break;
                 }
-                Packet packet = getMessagePacket(messageOut,Integer.valueOf(choice),Kc,serverPublicKey);
+                Packet packet = getMessagePacket(messageOut, Integer.valueOf(choice), Kc, serverPublicKey);
                 outgoing.println(MESSAGE + preparePacket(packet));
                 outgoing.flush();
                 if (outgoing.checkError())
@@ -277,7 +308,7 @@ class ChatClient
                         connection.close();
                         break;
                     }
-                    
+
                     messageIn = messageIn.substring(1);
                     System.out.println("This is the packet that is taken in: " + messageIn);
                     packet = getPacket(messageIn);
@@ -369,31 +400,31 @@ class ChatClient
         String secret = ASCII.BigIntToString(Kc);
         switch (testCase)
         {
-            //ShiftCipher + RSA + MAC+ Digital Signature + CA
+            //ShiftCipher + RSA + MAC
             case CASE1:
                 ShiftCipher shiftCipher = new ShiftCipher();
                 msg = shiftCipher.Encrypt(msg, ASCII.StringtoBigInt(secret));
                 break;
 
-            //SubsitutionCipher + RSA + Digital Signature + MAC + CA
+            //SubsitutionCipher + RSA + MAC
             case CASE2:
                 SubstitutionCipher subCipher = new SubstitutionCipher();
                 msg = ASCII.StringtoBigInt(subCipher.Encrypt(message, SUB_KEY));
                 break;
 
-            //PolyalphabeticCipher + RSA +Digital Signature + MAC + CA
+            //PolyalphabeticCipher + RSA + MAC
             case CASE3:
                 PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
                 msg = ASCII.StringtoBigInt(polyCipher.Encrypt(message, secret));
                 break;
 
-            //CBC + RSA + MAC + Digital Signature + CA
+            //CBC + RSA + MAC
             case CASE4:
                 CipherBlockChain cbc = new CipherBlockChain();
                 msg = ASCII.StringtoBigInt(cbc.Encrypt(message, IV));
                 break;
 
-            //Block Cipher + RSA + MAC + Digital Signature + CA
+            //Block Cipher + RSA + MAC
             case CASE5:
                 BlockCipher block = new BlockCipher();
                 msg = ASCII.StringtoBigInt(block.Encrypt(message));

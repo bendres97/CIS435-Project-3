@@ -90,7 +90,6 @@ public class ChatServer
         /* Wait for a connection request.  When it arrives, close
            down the listener.  Create streams for communication
            and exchange the handshake. */
-        
         String choice;
         BigInteger Kc;
         BigInteger Ks;
@@ -123,29 +122,30 @@ public class ChatServer
             System.out.println("Received:\t" + packetString);
             System.out.println("Packet:\t" + packet);
 
-            System.out.println("Case 1: ShiftCipher + RSA + MAC+ Digital Signature" 
-                    + "\n" +  "Case 2: PolyalphabeticCipher + RSA + Digital Signature + MAC" 
-                    + "\n" + "Case 5: Block Cipher + RSA + Digital Signature + MAC");
+            System.out.println("Server supports the following cipher suites:");
+            System.out.println("Case 1: ShiftCipher + RSA + MAC"
+                    + "\n\t" + "Case 2: PolyalphabeticCipher + RSAMAC"
+                    + "\n\t" + "Case 5: Block Cipher + RSA + MAC");
             System.out.println();
-            
+
             String[] packetDelimited = ASCII.BigIntToString(packet.getMessage()).split(";");
             String ciphers = packetDelimited[0];
             String clientKeyString = packetDelimited[1];
             clientPublicKey = keyFromString(clientKeyString);
-            
+
             String[] clientCiphers = ciphers.split(",");
             System.out.println("Ciphers: " + Arrays.toString(clientCiphers));
             System.out.println();
             choice = "";
             int i = 0;
-            
-            String pick [] = new String[2];
+
+            String pick[] = new String[2];
             //Pick a cipher
             for (String cipher : clientCiphers)
             {
-                
+
                 for (String CIPHER : CIPHERS)
-                {   
+                {
                     if (cipher.equals(CIPHER))
                     {
                         pick[i] = cipher;
@@ -154,9 +154,8 @@ public class ChatServer
                 }
             }
 
-            
             choice += pick[(new Random()).nextInt(pick.length)];
-            
+
             //If no cipher is found
             if (choice.equals(""))
             {
@@ -180,7 +179,7 @@ public class ChatServer
             String pmsString = incoming.readLine();
             System.out.println("Received: " + pmsString);
             System.out.println();
-            
+
             packet = getPacket(pmsString);
             PACKETS.add(packet);
             BigInteger pmsInt = packet.getMessage();
@@ -188,7 +187,7 @@ public class ChatServer
 
             System.out.println("PMS: " + pms);
             System.out.println();
-            
+
             //Create Encryption Keys
             BigInteger encryptionBase = pms.multiply(NONCE).multiply(clientNonce);
             int factorInt = 2;
@@ -204,7 +203,7 @@ public class ChatServer
             System.out.println("Ks:\t" + Ks);
             System.out.println("Ms:\t" + Ms);
             System.out.println();
-            
+
             //Calculate MAC values
             BigInteger packetSum = BigInteger.ZERO;
             for (Packet pkt : PACKETS)
@@ -218,7 +217,7 @@ public class ChatServer
             System.out.println("MACc: " + MACc);
             System.out.println("MACs: " + MACs);
             System.out.println();
-            
+
             //Send MACc
             packet = new Packet(NONCE, MACs);
             outgoing.println(preparePacket(packet));
@@ -229,7 +228,7 @@ public class ChatServer
             packet = getPacket(MACc_rec);
             System.out.println("Received MACc: " + packet.getMessage());
             System.out.println();
-            
+
             if (MACc.equals(packet.getMessage()))
             {
                 System.out.println("MAC check is equal. Secure connection established.");
@@ -255,6 +254,37 @@ public class ChatServer
          strictly back and forth. */
         try
         {
+            //Randomly create IV
+            Random rand = new Random();
+            String iv = "";
+            for (int n = 0; n < 3; n++)
+            {
+                iv += rand.nextBoolean() ? "1" : "0";
+            }
+
+            IV = iv;
+
+            //Creates Substitution Key
+            char[] substitutionKey = new char[128];
+            for (int n = 0; n < substitutionKey.length; n++)
+            {
+                substitutionKey[n] = (char) n;
+            }
+
+            //Randomly shuffle the array.
+            Random shuffler = new Random();
+            for (int n = 0; n < 10000; n++)
+            {
+                int index1 = shuffler.nextInt(substitutionKey.length);
+                int index2 = shuffler.nextInt(substitutionKey.length);
+
+                //Swap
+                char temp = substitutionKey[index1];
+                substitutionKey[index1] = substitutionKey[index2];
+                substitutionKey[index2] = temp;
+            }
+
+            SUB_KEY = substitutionKey;
             userInput = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("NOTE: Enter 'quit' to end the program.\n");
             while (true)
@@ -274,16 +304,16 @@ public class ChatServer
                         connection.close();
                         break;
                     }
-                    
+
                     messageIn = messageIn.substring(1);
                     Packet packet = getPacket(messageIn);
-                    System.out.println("This is the packet that is taken in: " + packet);                   
+                    System.out.println("This is the packet that is taken in: " + packet);
                     recMsg = getMessage(packet, Kc, Integer.valueOf(choice));
-                    
+
                 }
                 System.out.println("RECEIVED:  " + recMsg);
                 System.out.println();
-                
+
                 System.out.print("SEND:      ");
                 messageOut = userInput.readLine();
                 if (messageOut.equalsIgnoreCase("quit"))
@@ -296,7 +326,7 @@ public class ChatServer
                     System.out.println("Connection closed.");
                     break;
                 }
-                Packet packet = getMessagePacket(messageOut,Integer.valueOf(choice),Ks,clientPublicKey);
+                Packet packet = getMessagePacket(messageOut, Integer.valueOf(choice), Ks, clientPublicKey);
                 outgoing.println(MESSAGE + preparePacket(packet));
                 outgoing.flush();
                 if (outgoing.checkError())
@@ -433,7 +463,7 @@ public class ChatServer
 
         return new Packet(NONCE, msg);
     }
-    
+
     //Check the integrity of the message, only decrypt if authentic.
     public static String getMessage(Packet packet, BigInteger Kc, int testCase)
     {
