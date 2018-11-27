@@ -110,6 +110,12 @@ class ChatClient
             //BEGIN HANDSHAKING HERE
             //Send Cipher Suite
             String ciphers = "1,2,3";
+            System.out.println("Here are the ciphers that Server has: ");
+            System.out.println("Case 1: ShiftCipher + RSA + MAC+ Digital Signature" 
+                    + "\n" +  "Case 2: SubstitutionCipher + RSA + Digital Signature + MAC" 
+                    + "\n" + "Case 3: PolyalphabeticCipher + RSA + Digital Signature + MAC");
+            System.out.println();
+            
             String publicKeyString = keyToString(PUBLIC_KEY);
             String ciphers_Key = ciphers + ';' + publicKeyString;
             BigInteger ckInt = ASCII.StringtoBigInt(ciphers_Key);
@@ -126,7 +132,8 @@ class ChatClient
             BigInteger messageInt = packet.getMessage();
 
             System.out.println("Received: " + packetString);
-
+            System.out.println();
+            
             String[] message = ASCII.BigIntToString(messageInt).split(";");
             choice = message[0];
             String nonceString = message[1];
@@ -137,7 +144,8 @@ class ChatClient
             System.out.println("Choice: " + choice);
             System.out.println("Encrypted Nonce: " + nonceString);
             System.out.println("Key: " + serverPublicKey.toString());
-
+            System.out.println();
+            
             //Verify Nonce
             BigInteger encryptedNonce = new BigInteger(nonceString);
             BigInteger nonce = serverPublicKey.crypt(encryptedNonce);
@@ -178,7 +186,8 @@ class ChatClient
             System.out.println("Mc:\t" + Mc);
             System.out.println("Ks:\t" + Ks);
             System.out.println("Ms:\t" + Ms);
-
+            System.out.println();
+            
             //Calculate MAC values
             BigInteger packetSum = BigInteger.ZERO;
             for (Packet pkt : PACKETS)
@@ -191,7 +200,8 @@ class ChatClient
 
             System.out.println("MACc: " + MACc);
             System.out.println("MACs: " + MACs);
-
+            System.out.println();
+            
             //Send MACc
             packet = new Packet(NONCE, MACc);
             outgoing.println(preparePacket(packet));
@@ -201,7 +211,8 @@ class ChatClient
             String MACs_rec = incoming.readLine();
             packet = getPacket(MACs_rec);
             System.out.println("Received MACs: " + packet.getMessage());
-
+            System.out.println();
+            
             if (MACs.equals(packet.getMessage()))
             {
                 System.out.println("MAC check is equal. Secure connection established.");
@@ -268,10 +279,13 @@ class ChatClient
                     }
                     
                     messageIn = messageIn.substring(1);
+                    System.out.println("This is the packet that is taken in: " + messageIn);
                     packet = getPacket(messageIn);
                     recMsg = getMessage(packet, Ks, Integer.valueOf(choice));
+                    System.out.println("This is the received message from the packet: " +recMsg );
                 }
                 System.out.println("RECEIVED:  " + recMsg);
+                System.out.println();
             }
         }
         catch (Exception e)
