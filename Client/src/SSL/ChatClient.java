@@ -106,33 +106,52 @@ class ChatClient
             }
             System.out.println("Connected. Initiating Handshake");
 
-            //BEGIN HANDSHAKING HERE
-            //Send Cipher Suite
+            /////////////////////////////////////////////////////
+            //Start of handshake////////////////////////////////
+            ////////////////////////////////////////////////////
+            
+            //Step 1 of the handshake
+            
+            //Cases that the Client holds
             String ciphers = "1,2,3";
+            
+            //Client suports the following cipher suits
             System.out.println("Client supports the following cipher suites:");
             System.out.println("\tCase 1: ShiftCipher + RSA + MAC"
                     + "\n\t" + "Case 2: SubstitutionCipher + RSA + MAC"
                     + "\n\t" + "Case 3: PolyalphabeticCipher + RSA + MAC");
             System.out.println();
 
+            //Taking the public key of the client and concatenating with ciphers key 
             String publicKeyString = keyToString(PUBLIC_KEY);
             String ciphers_Key = ciphers + ';' + publicKeyString;
             BigInteger ckInt = ASCII.StringtoBigInt(ciphers_Key);
+            
+            //Adds the cipher key and Client nonce into a packet
             Packet packet = new Packet(NONCE, ckInt);
             PACKETS.add(packet);
+            
+            //Sends the packet to server
             outgoing.println(preparePacket(packet));
             outgoing.flush();
 
+            //Step 2 of the handshake
+            
             //Get Cipher Choice and Public Key
             String packetString = incoming.readLine();
             packet = getPacket(packetString);
+            
+            //Adds packet into a queue
             PACKETS.add(packet);
+            
+            //Retrieves the message and server nonce from packet
             BigInteger serverNonce = packet.getSessionKey();
             BigInteger messageInt = packet.getMessage();
 
             System.out.println("Received: " + packetString);
             System.out.println();
 
+            //Splits the message into the key, nonce and cipher suit choice
             String[] message = ASCII.BigIntToString(messageInt).split(";");
             choice = message[0];
             String nonceString = message[1];
@@ -145,10 +164,12 @@ class ChatClient
             System.out.println("Key: " + serverPublicKey.toString());
             System.out.println();
 
-            //Verify Nonce
+            //Step 3 of the handshake
+            
+            //Verify the nonce using the server's public key
             BigInteger encryptedNonce = new BigInteger(nonceString);
             BigInteger nonce = serverPublicKey.crypt(encryptedNonce);
-
+            
             if (NONCE.equals(nonce))
             {
                 System.out.println("Authentication Passed");
@@ -161,18 +182,25 @@ class ChatClient
                 System.exit(1);
             }
 
+            //Creates premaster key
             BigInteger pms = BigInteger.valueOf(Math.abs(RAND.nextInt()));
             BigInteger encryptedPMS = serverPublicKey.crypt(pms);
 
-            //Send
+            //Sends the nonce and encrypted pre master key
             packet = new Packet(NONCE, encryptedPMS);
+            
+            //put the packet into a list
             PACKETS.add(packet);
             System.out.println("Sending PMS to client: " + pms);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
 
-            //Create Encryption Keys
+            //Step 4 of the handshake
+            
+            //Create Encryption Keys: Kc, Mc, Ks, Ms
             BigInteger encryptionBase = pms.multiply(NONCE).multiply(serverNonce);
+            
+            //All of the encryption keys are different values of Big Integers 
             int factorInt = 2;
             BigInteger factor = BigInteger.valueOf(factorInt);
             Kc = encryptionBase.divide(factor);
@@ -187,13 +215,14 @@ class ChatClient
             System.out.println("Ms:\t" + Ms);
             System.out.println();
 
-            //Calculate MAC values
+            //Step 5 of the handshake
+            
+            //Calculate the MAC values by using the Mc and Ms
             BigInteger packetSum = BigInteger.ZERO;
             for (Packet pkt : PACKETS)
             {
                 packetSum = packetSum.add(pkt.getHashSum());
             }
-
             BigInteger MACc = packetSum.mod(Mc);
             BigInteger MACs = packetSum.mod(Ms);
 
@@ -201,17 +230,20 @@ class ChatClient
             System.out.println("MACs: " + MACs);
             System.out.println();
 
-            //Send MACc
+            //Step 7 of the handshake
+            
+            //Send MACc to the server
             packet = new Packet(NONCE, MACc);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
 
-            //Receive MACs
+            //Receive MACs from the server
             String MACs_rec = incoming.readLine();
             packet = getPacket(MACs_rec);
             System.out.println("Received MACs: " + packet.getMessage());
             System.out.println();
 
+            //Compares the MACs from the client and MACs from the server
             if (MACs.equals(packet.getMessage()))
             {
                 System.out.println("MAC check is equal. Secure connection established.");
@@ -219,6 +251,8 @@ class ChatClient
 
             else
             {
+                //If the MACs from the client and the MACs from the server don't equal each other,
+                //aborting progam
                 System.out.println("ERROR: Insecure connection. Aborting");
                 connection.close();
                 System.exit(1);
@@ -238,7 +272,7 @@ class ChatClient
          After that,  messages alternate strictly back and forth. */
         try
         {
-            //Randomly create IV
+            //Randomly create IV that is 3 bits long
             Random rand = new Random();
             String iv = "";
             for (int n = 0; n < 3; n++)
@@ -309,6 +343,7 @@ class ChatClient
                         break;
                     }
 
+                    //Takes the first part of messageIn
                     messageIn = messageIn.substring(1);
                     System.out.println("This is the packet that is taken in: " + messageIn);
                     packet = getPacket(messageIn);
@@ -394,6 +429,14 @@ class ChatClient
         return new RSAKey(n, exp);
     }
 
+    /**
+     * Encrypts the message using different forms of encryption then authenticates using MAC before sending the code
+     *@author Bryan Endres
+     * @author Andrew Bradley
+     * @param Message, test case, Kc, and RSAKey server public key
+     * @return a packet
+     * 
+     */
     public static Packet getMessagePacket(String message, int testCase, BigInteger Kc, RSAKey serverPublicKey)
     {
         BigInteger msg = ASCII.StringtoBigInt(message);
@@ -436,7 +479,7 @@ class ChatClient
                 return null;
         }
 
-        //MAC
+        //Calculating the MAC
         message = ASCII.BigIntToString(msg);
         message = ASCII.BigIntToString(MAC.authenticate(message, secret));
 
@@ -447,7 +490,13 @@ class ChatClient
         return new Packet(NONCE, msg);
     }
 
-    //Check the integrity of the message, only decrypt if authentic.
+    /**
+     * Check the integrity of the message, only decrypt if  by comparing the two MAC.
+     * @param packet
+     * @param Ks
+     * @param testCase
+     * @return a string that gets printed out from either the client and server
+     */
     public static String getMessage(Packet packet, BigInteger Ks, int testCase)
     {
         String secret = ASCII.BigIntToString(Ks);
