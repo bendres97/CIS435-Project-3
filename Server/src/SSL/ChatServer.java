@@ -90,6 +90,11 @@ public class ChatServer
         /* Wait for a connection request.  When it arrives, close
            down the listener.  Create streams for communication
            and exchange the handshake. */
+        
+        String choice;
+        BigInteger Kc;
+        BigInteger Ks;
+        RSAKey clientPublicKey;
         try
         {
             listener = new ServerSocket(port);
@@ -118,9 +123,14 @@ public class ChatServer
             System.out.println("Received:\t" + packetString);
             System.out.println("Packet:\t" + packet);
 
-            String[] clientCiphers = ASCII.BigIntToString(packet.getMessage()).split(",");
+            String[] packetDelimited = ASCII.BigIntToString(packet.getMessage()).split(";");
+            String ciphers = packetDelimited[0];
+            String clientKeyString = packetDelimited[1];
+            clientPublicKey = keyFromString(clientKeyString);
+            
+            String[] clientCiphers = ciphers.split(",");
             System.out.println("Ciphers: " + Arrays.toString(clientCiphers));
-            String choice = "";
+            choice = "";
 
             //Pick a cipher
             for (String cipher : clientCiphers)
@@ -168,9 +178,9 @@ public class ChatServer
             BigInteger encryptionBase = pms.multiply(NONCE).multiply(clientNonce);
             int factorInt = 2;
             BigInteger factor = BigInteger.valueOf(factorInt);
-            BigInteger Kc = encryptionBase.divide(factor);
+            Kc = encryptionBase.divide(factor);
             BigInteger Mc = Kc.pow(factorInt);
-            BigInteger Ks = Mc.multiply(factor);
+            Ks = Mc.multiply(factor);
             BigInteger Ms = Ks.nextProbablePrime();
 
             System.out.println("Product:\t" + encryptionBase);
@@ -213,14 +223,6 @@ public class ChatServer
                 connection.close();
                 System.exit(1);
             }
-
-            String firstMsg = incoming.readLine();
-            packet = getPacket(firstMsg);
-            
-            System.out.println(packet);
-            
-            System.out.println(getMessage(packet,Kc,Integer.valueOf(choice)));
-
         }
         catch (Exception e)
         {
@@ -241,6 +243,7 @@ public class ChatServer
             {
                 System.out.println("WAITING...");
                 messageIn = incoming.readLine();
+                String recMsg = messageIn;
                 if (messageIn.length() > 0)
                 {
                     // The first character of the message is a command. If 
@@ -253,9 +256,12 @@ public class ChatServer
                         connection.close();
                         break;
                     }
+                    
                     messageIn = messageIn.substring(1);
+                    Packet packet = getPacket(messageIn);
+                    recMsg = getMessage(packet, Kc, Integer.valueOf(choice));
                 }
-                System.out.println("RECEIVED:  " + messageIn);
+                System.out.println("RECEIVED:  " + recMsg);
                 System.out.print("SEND:      ");
                 messageOut = userInput.readLine();
                 if (messageOut.equalsIgnoreCase("quit"))
@@ -268,8 +274,9 @@ public class ChatServer
                     System.out.println("Connection closed.");
                     break;
                 }
-                outgoing.println(MESSAGE + messageOut);
-                outgoing.flush(); // Make sure the data is sent!
+                Packet packet = getMessagePacket(messageOut,Integer.valueOf(choice),Ks,clientPublicKey);
+                outgoing.println(MESSAGE + preparePacket(packet));
+                outgoing.flush();
                 if (outgoing.checkError())
                 {
                     throw new IOException("Error occurred while transmitting message.");
@@ -352,7 +359,7 @@ public class ChatServer
         return new RSAKey(n, exp);
     }
 
-    public static Packet getMessagePacket(String message, int testCase, BigInteger Ks, RSAKey serverPublicKey)
+    public static Packet getMessagePacket(String message, int testCase, BigInteger Ks, RSAKey clientPublicKey)
     {
         String secret = ASCII.BigIntToString(Ks);
         BigInteger msg = ASCII.StringtoBigInt(message);
@@ -400,7 +407,7 @@ public class ChatServer
 
         //Encrypt with RSA
         msg = ASCII.StringtoBigInt(message);
-        msg = msg.modPow(serverPublicKey.getEXP(), serverPublicKey.getN());
+        msg = msg.modPow(clientPublicKey.getEXP(), clientPublicKey.getN());
 
         return new Packet(NONCE, msg);
     }

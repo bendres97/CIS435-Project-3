@@ -90,6 +90,7 @@ class ChatClient
         BigInteger Kc;
         BigInteger Ks;
         String choice;
+        RSAKey serverPublicKey;
         try
         {
             System.out.println("Connecting to " + computer + " on port " + port);
@@ -108,8 +109,11 @@ class ChatClient
 
             //BEGIN HANDSHAKING HERE
             //Send Cipher Suite
-            BigInteger ciphers = ASCII.StringtoBigInt("1,2,3");
-            Packet packet = new Packet(NONCE, ciphers);
+            String ciphers = "1,2,3";
+            String publicKeyString = keyToString(PUBLIC_KEY);
+            String ciphers_Key = ciphers + ';' + publicKeyString;
+            BigInteger ckInt = ASCII.StringtoBigInt(ciphers_Key);
+            Packet packet = new Packet(NONCE, ckInt);
             PACKETS.add(packet);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
@@ -128,7 +132,7 @@ class ChatClient
             String nonceString = message[1];
             String keyString = message[2];
 
-            RSAKey serverPublicKey = keyFromString(keyString);
+            serverPublicKey = keyFromString(keyString);
 
             System.out.println("Choice: " + choice);
             System.out.println("Encrypted Nonce: " + nonceString);
@@ -240,7 +244,7 @@ class ChatClient
                     System.out.println("Connection closed.");
                     break;
                 }
-                Packet packet = getMessagePacket(messageOut,Integer.valueOf(choice),Kc,PUBLIC_KEY);
+                Packet packet = getMessagePacket(messageOut,Integer.valueOf(choice),Kc,serverPublicKey);
                 outgoing.println(MESSAGE + preparePacket(packet));
                 outgoing.flush();
                 if (outgoing.checkError())
@@ -249,6 +253,7 @@ class ChatClient
                 }
                 System.out.println("WAITING...");
                 messageIn = incoming.readLine();
+                String recMsg = messageIn;
                 if (messageIn.length() > 0)
                 {
                     // The first character of the message is a command. If 
@@ -264,9 +269,9 @@ class ChatClient
                     
                     messageIn = messageIn.substring(1);
                     packet = getPacket(messageIn);
-                    String recMsg = getMessage(packet, Ks, Integer.valueOf(choice));
+                    recMsg = getMessage(packet, Ks, Integer.valueOf(choice));
                 }
-                System.out.println("RECEIVED:  " + messageIn);
+                System.out.println("RECEIVED:  " + recMsg);
             }
         }
         catch (Exception e)
