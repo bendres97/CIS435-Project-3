@@ -113,6 +113,7 @@ class ChatClient
             /////////////////////////////////////////////////////
             //Start of handshake////////////////////////////////
             ////////////////////////////////////////////////////
+            
             //Step 1 of the handshake
             //Cases that the Client holds
             String ciphers = "1,2,3";
@@ -131,6 +132,7 @@ class ChatClient
 
             //Adds the cipher key and Client nonce into a packet
             Packet packet = new Packet(NONCE, ckInt);
+            //Adds packet to array list
             PACKETS.add(packet);
 
             //Sends the packet to server

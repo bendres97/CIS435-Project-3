@@ -115,19 +115,28 @@ public class ChatServer
             //Start of handshake////////////////////////////////
             ////////////////////////////////////////////////////
 
-            //Receive cipher suite
+            //Step 1 of the handshake
+            //Receive cipher suite from the client in the form of a packet
             String packetString = incoming.readLine();
             Packet packet = getPacket(packetString);
+            //Adds packet to array list
             PACKETS.add(packet);
+            
             System.out.println("Received:\t" + packetString);
             System.out.println("Packet:\t" + packet);
 
+            //Client suports the following cipher suits
             System.out.println("Server supports the following cipher suites:");
             System.out.println("Case 1: ShiftCipher + RSA + MAC"
                     + "\n\t" + "Case 2: PolyalphabeticCipher + RSAMAC"
                     + "\n\t" + "Case 5: Block Cipher + RSA + MAC");
             System.out.println();
 
+            //Step 2 of the handshake
+            //Splits the received packet using a ";"
+            //First index of the array is the ciphers
+            //Second index of the array is client's nonce
+            //Third index of the array is client's public key
             String[] packetDelimited = ASCII.BigIntToString(packet.getMessage()).split(";");
             String ciphers = packetDelimited[0];
             String clientKeyString = packetDelimited[1];
@@ -136,14 +145,13 @@ public class ChatServer
             String[] clientCiphers = ciphers.split(",");
             System.out.println("Ciphers: " + Arrays.toString(clientCiphers));
             System.out.println();
+            
             choice = "";
             int i = 0;
-
             String pick[] = new String[2];
-            //Pick a cipher
+            //Pick a cipher out of the ciphers that were given from client and server
             for (String cipher : clientCiphers)
             {
-
                 for (String CIPHER : CIPHERS)
                 {
                     if (cipher.equals(CIPHER))
@@ -153,7 +161,8 @@ public class ChatServer
                     }
                 }
             }
-
+            
+            //Randomly picks a cipher suit to use
             choice += pick[(new Random()).nextInt(pick.length)];
 
             //If no cipher is found
@@ -170,26 +179,40 @@ public class ChatServer
             String keyString = keyToString(PUBLIC_KEY);
             String nonceString = encryptedNonce.toString();
             BigInteger message = ASCII.StringtoBigInt(choice + ';' + nonceString + ';' + keyString);
+            
+            //Placees the nonce and cipher that was chosen back into a packet to be sent back to client
             packet = new Packet(NONCE, message);
+            
+            //Adds packet to array list 
             PACKETS.add(packet);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
 
+            //Step 3 of the handshake
+            
             //Receive Pre Master Secret
             String pmsString = incoming.readLine();
             System.out.println("Received: " + pmsString);
             System.out.println();
 
             packet = getPacket(pmsString);
+            
+            //Adds packet to array list
             PACKETS.add(packet);
             BigInteger pmsInt = packet.getMessage();
+            
+            //Decryts the pms using private key of the server
             BigInteger pms = PRIVATE_KEY.crypt(pmsInt);
 
             System.out.println("PMS: " + pms);
             System.out.println();
 
-            //Create Encryption Keys
+            //Step 4 of the Handshake
+            
+            //Create Encryption Keys: Kc, Mc, Ks, Ms          
             BigInteger encryptionBase = pms.multiply(NONCE).multiply(clientNonce);
+            
+            //All of the encryption keys are different values of Big Integers
             int factorInt = 2;
             BigInteger factor = BigInteger.valueOf(factorInt);
             Kc = encryptionBase.divide(factor);
@@ -204,7 +227,8 @@ public class ChatServer
             System.out.println("Ms:\t" + Ms);
             System.out.println();
 
-            //Calculate MAC values
+            //Step 5 of the handshake
+            //Calculate the MAC values by using the Mc and Ms
             BigInteger packetSum = BigInteger.ZERO;
             for (Packet pkt : PACKETS)
             {
@@ -218,16 +242,19 @@ public class ChatServer
             System.out.println("MACs: " + MACs);
             System.out.println();
 
-            //Send MACc
+            //Step 7 of the handshake
+            //Send MACs to the client
             packet = new Packet(NONCE, MACs);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
 
-            //Receive MACc
+            //Receive MACc from the client
             String MACc_rec = incoming.readLine();
             packet = getPacket(MACc_rec);
             System.out.println("Received MACc: " + packet.getMessage());
             System.out.println();
+
+            //Compares the MACs from the client and MACs from the server
 
             if (MACc.equals(packet.getMessage()))
             {
@@ -236,6 +263,8 @@ public class ChatServer
 
             else
             {
+                //If the MACs from the client and the MACs from the server don't equal each other,
+                //aborting progam
                 System.out.println("ERROR: Insecure connection. Aborting");
                 connection.close();
                 System.exit(1);
@@ -255,7 +284,7 @@ public class ChatServer
          strictly back and forth. */
         try
         {
-            //Randomly create IV
+            //Randomly create IV that is 3 bits long
             Random rand = new Random();
             String iv = "";
             for (int n = 0; n < 3; n++)
@@ -306,7 +335,8 @@ public class ChatServer
                         connection.close();
                         break;
                     }
-
+                    
+                    //Takes the first part of messageIn
                     messageIn = messageIn.substring(1);
                     Packet packet = getPacket(messageIn);
                     System.out.println("Received: " + packet);
