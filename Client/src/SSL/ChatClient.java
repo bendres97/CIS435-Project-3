@@ -1,7 +1,11 @@
 package SSL;
 
+import Cryptography.*;
+import Network.*;
 import java.io.*;
+import java.math.BigInteger;
 import java.net.*;
+import java.util.Random;
 
 /**
  * This program is one end of a simple command-line interface chat program. It
@@ -40,6 +44,12 @@ class ChatClient
      * This character is sent to the connected program when the user quits.
      */
     static final char CLOSE = '1';  //more like the type in SSL
+    
+    static final Random RAND = new Random();
+    static final BigInteger NONCE = BigInteger.valueOf(RAND.nextInt());
+    static final AsciiConverter ASCII = new AsciiConverter();
+    static final Sender SENDER = new Sender();
+    static final Receiver RECEIVER = new Receiver();
 
     public static void main(String[] args)
     {
@@ -79,10 +89,11 @@ class ChatClient
             System.out.println("Connected. Initiating Handshake");
 
             //BEGIN HANDSHAKING HERE
-            outgoing.println("1,2,3");
+            //Send Cipher Suite
+            BigInteger ciphers = ASCII.StringtoBigInt("1,2,3");
+            Packet packet = new Packet(NONCE,ciphers,new BigInteger("0"));
+            outgoing.println(preparePacket(packet));
             outgoing.flush();
-            String msg = incoming.readLine();
-            System.out.println("Received " + msg);
         }
         catch (Exception e)
         {
@@ -144,6 +155,43 @@ class ChatClient
             System.exit(1);
         }
 
-    }  // end main()
+    }
+
+    /**
+     * Converts a given string into a packet object.
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param incoming the String to convert
+     * @return a Packet
+     */
+    public static Packet getPacket(String incoming)
+    {
+        String[] packetString = incoming.split(";");
+
+        BigInteger sessionKey = new BigInteger(packetString[0]);
+        BigInteger message = new BigInteger(packetString[1]);
+        BigInteger signature = new BigInteger(packetString[2]);
+
+        return new Packet(sessionKey, message, signature);
+    }
+
+    /**
+     * Converts a given packet to a String that can be sent over a network.
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param packet The packet
+     * @return a String
+     */
+    public static String preparePacket(Packet packet)
+    {
+        String packetString = "";
+        packetString += packet.getSessionKey().toString() + ';';
+        packetString += packet.getMessage().toString() + ';';
+        packetString += packet.getSignature().toString() + ';';
+
+        return packetString;
+    }
 
 } //end class ChatClient

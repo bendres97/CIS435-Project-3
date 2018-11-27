@@ -1,11 +1,13 @@
 package SSL;
 
-import Cryptography.RSA;
+import Cryptography.AsciiConverter;
 import Network.Packet;
+import Network.Receiver;
+import Network.Sender;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -46,6 +48,13 @@ public class ChatServer
      * This character is sent to the connected program when the user quits.
      */
     static final char CLOSE = '1'; //more like the type in SSL
+    
+    static final Random RAND = new Random();
+    static final BigInteger NONCE = BigInteger.valueOf(RAND.nextInt());
+    static final AsciiConverter ASCII = new AsciiConverter();
+    static final Sender SENDER = new Sender();
+    static final Receiver RECEIVER = new Receiver();
+    static final String[] CIPHERS = {"1","3","5"};
 
     public static void main(String[] args)
     {
@@ -86,118 +95,31 @@ public class ChatServer
             /////////////////////////////////////////////////////
             //Start of handshake////////////////////////////////
             ////////////////////////////////////////////////////
-            
-            //Handshake portion 1
-            String msg = incoming.readLine();
-            System.out.println("Received " + msg);
-            
-            String algo = "";
 
-            //Picks what cipher spec to use
-            String ciphers = "1,4,5";
-
-            String[] parsing = ciphers.split(",");
+            String packetString = incoming.readLine();
+            Packet packet = getPacket(packetString);
+            System.out.println("Received:\t" + packetString);
+            System.out.println("Packet:\t" + packet);
             
-            String [] parsingIn = msg.split(",");
-            for(int i = 0; i< parsingIn.length; i++)
+            String[] clientCiphers = ASCII.BigIntToString(packet.getMessage()).split(",");
+            System.out.println("Ciphers: " + Arrays.toString(clientCiphers));
+            String choice = "Unsupported";
+            
+            for(String cipher : clientCiphers)
             {
-               System.out.println(parsingIn[i]); 
+                for(String CIPHER : CIPHERS)
+                {
+                    if(cipher.equals(CIPHER))
+                        choice = cipher;
+                }
             }
             
-            for (int i = 0; i < parsing.length; i++)
-		{
-		for (int j = 0; j < parsingIn.length; j++)
-			{
-				if(parsing[i].equals(parsingIn[j]))
-				{
-                                    algo = parsing[i];
-				}
-			}
-		}
-          
-            
-            BigInteger cipher = new BigInteger(algo);
-            Random rng = new Random();
-
-            BigInteger servNonce = BigInteger.valueOf(rng.nextInt(1000) + 1);
-
-            RSA rsa = new RSA();
-            
-            BigInteger privateKey = rsa.getPrivateKey().getEXP().add(rsa.getPrivateKey().getN());
-            BigInteger publicKeyEXP =  rsa.getPublicKey().getEXP();
-            BigInteger publicKeyN = rsa.getPublicKey().getN();
-    
-            
-           // System.out.println(bigKey);
-            Packet pk1EXP = new Packet(servNonce, cipher, publicKeyEXP);
-            Packet pk1N = new Packet(servNonce, cipher,publicKeyN);
-
-            System.out.println("Connected.  Waiting for the first message.");
-            
-            
-            outgoing.print(pk1EXP);
-            outgoing.print(pk1N);
-            
-//            //handshake portion 2
-//            BigInteger session2 = BigInteger.valueOf(incoming.read());
-//            BigInteger message2 = BigInteger.valueOf(incoming.read());
-//            BigInteger signature2 = BigInteger.valueOf(incoming.read());
-//            Packet clientPK2 = new Packet(session2, message2, signature2);
-//            BigInteger mes = clientPK2.getMessage();
-//            BigInteger ses =  clientPK2.getSessionKey();
-//            BigInteger sig = clientPK2.getSignature();
-//            
-//            BigInteger diffKeys = mes.multiply(ses).multiply(sig);
-//            String stringofKeys = diffKeys.toString();
-//           
-//            if(stringofKeys.length()%8!=0)
-//            {
-//                switch (stringofKeys.length()%8) {
-//                    case 7:
-//                        stringofKeys+="0";
-//                        break;
-//                    case 6:
-//                        stringofKeys+="00";
-//                        break;
-//                    case 5:
-//                        stringofKeys+="000";
-//                        break;
-//                    case 4:
-//                        stringofKeys+="0000";
-//                        break;
-//                    case 3:
-//                        stringofKeys+="00000";
-//                        break;
-//                    case 2:
-//                        stringofKeys+="000000";
-//                        break;
-//                    case 1:
-//                        stringofKeys+="0000000";
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-//            String k [] = null;
-//           
-//            for(int i = 0; i<stringofKeys.length(); i+=2)
-//            {
-//                int j = 0;
-//                k[j] = stringofKeys.substring(i, i+1);
-//                j++;
-//            }
-//            
-//            String Kc = k[0]; 
-//            String Mc = k[1]; 
-//            String Ks = k[2]; 
-//            String Ms = k[3]; 
-//            System.out.println("this is the Kc:" + Kc);
-//            System.out.println("this is the Mc:" + Mc);
-//            System.out.println("this is the Ks:" + Ks);
-//            System.out.println("this is the Ms:" + Ms);
-            
-            outgoing.println("ACK");
-            outgoing.flush();
+            if(choice.equals("Unsupported"))
+            {
+                System.out.println("This client is not supported");
+                connection.close();
+                System.exit(1);
+            }
         }
         catch (Exception e)
         {
@@ -260,6 +182,43 @@ public class ChatServer
             System.exit(1);
         }
 
-    }  // end main()
+    }
+
+    /**
+     * Converts a given string into a packet object.
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param incoming the String to convert
+     * @return a Packet
+     */
+    public static Packet getPacket(String incoming)
+    {
+        String[] packetString = incoming.split(";");
+
+        BigInteger sessionKey = new BigInteger(packetString[0]);
+        BigInteger message = new BigInteger(packetString[1]);
+        BigInteger signature = new BigInteger(packetString[2]);
+
+        return new Packet(sessionKey, message, signature);
+    }
+
+    /**
+     * Converts a given packet to a String that can be sent over a network.
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param packet The packet
+     * @return a String
+     */
+    public static String preparePacket(Packet packet)
+    {
+        String packetString = "";
+        packetString += packet.getSessionKey().toString() + ';';
+        packetString += packet.getMessage().toString() + ';';
+        packetString += packet.getSignature().toString() + ';';
+
+        return packetString;
+    }
 
 } //end class ChatServer
