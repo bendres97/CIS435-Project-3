@@ -2,6 +2,7 @@ package Network;
 
 /**
  * Acts as a simulator of a Network
+ *
  * @author Bryan Endres
  * @since 10-29-2018
  */
@@ -60,7 +61,7 @@ public class Network implements NetworkADT
             substitutionKey[index1] = substitutionKey[index2];
             substitutionKey[index2] = temp;
         }
-        
+
         SUB_KEY = substitutionKey;
     }
 
@@ -104,12 +105,12 @@ public class Network implements NetworkADT
     {
         return outToReceiver;
     }
-    
+
     public String getIV()
     {
         return IV;
     }
-    
+
     public char[] getSubKey()
     {
         return SUB_KEY;

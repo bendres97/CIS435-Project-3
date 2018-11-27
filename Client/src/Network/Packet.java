@@ -38,10 +38,10 @@ public class Packet implements PacketADT
         this.message = message;
         this.signature = signature;
     }
-    
+
     public Packet(BigInteger nonce, BigInteger message)
     {
-       this(nonce, message, BigInteger.ZERO);
+        this(nonce, message, BigInteger.ZERO);
     }
 
     /**
@@ -138,7 +138,7 @@ public class Packet implements PacketADT
 
         return result;
     }
-    
+
     public BigInteger getHashSum()
     {
         return message.add(signature).add(sessionKey);

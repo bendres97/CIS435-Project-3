@@ -113,7 +113,6 @@ class ChatClient
             /////////////////////////////////////////////////////
             //Start of handshake////////////////////////////////
             ////////////////////////////////////////////////////
-            
             //Step 1 of the handshake
             //Cases that the Client holds
             String ciphers = "1,2,3";

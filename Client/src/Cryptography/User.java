@@ -1,8 +1,8 @@
 package Cryptography;
 
-
 /**
- * A User holds a name, ID, and RSA object. A User can be used as either a sender or receiver.
+ * A User holds a name, ID, and RSA object. A User can be used as either a
+ * sender or receiver.
  *
  * @author Bryan Endres ID: 8
  * @date 9-30-2018

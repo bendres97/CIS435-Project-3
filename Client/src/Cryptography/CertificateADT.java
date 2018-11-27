@@ -1,8 +1,7 @@
 package Cryptography;
 
-
 /**
- *ADT for Certificate Object
+ * ADT for Certificate Object
  *
  * @author Bryan Endres ID: 8
  * @date 9-30-2018

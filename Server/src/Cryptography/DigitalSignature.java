@@ -1,6 +1,5 @@
 package Cryptography;
 
-
 import java.math.BigInteger;
 
 /**
@@ -59,7 +58,7 @@ public class DigitalSignature implements DigitalSignatureADT
         //Check to see if the hashed message and decrypted hash are equal
         return decryptedHash.equals(messageHash);
     }
-    
+
     public boolean authenticate(BigInteger hash, BigInteger message)
     {
         RSAKey publicKey = RSA.getPublicKey();

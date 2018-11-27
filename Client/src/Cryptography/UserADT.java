@@ -1,6 +1,5 @@
 package Cryptography;
 
-
 /**
  * The ADT for a User object.
  *

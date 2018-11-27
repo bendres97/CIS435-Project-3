@@ -1,8 +1,7 @@
 package Cryptography;
 
-
 /**
- *The ADT for Polyalphabetic Cipher.
+ * The ADT for Polyalphabetic Cipher.
  *
  * @author Bryan Endres ID: 8
  * @date 9-30-2018

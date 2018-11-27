@@ -1,8 +1,8 @@
 package Cryptography;
 
-
 /**
- * Polyalphabetic Cipher has no constructor and only encrypts/decrypts messages using supplied shifts.
+ * Polyalphabetic Cipher has no constructor and only encrypts/decrypts messages
+ * using supplied shifts.
  *
  * @author Bryan Endres ID: 8
  * @date 9-30-2018

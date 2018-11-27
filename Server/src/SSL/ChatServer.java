@@ -121,7 +121,7 @@ public class ChatServer
             Packet packet = getPacket(packetString);
             //Adds packet to array list
             PACKETS.add(packet);
-            
+
             System.out.println("Received:\t" + packetString);
             System.out.println("Packet:\t" + packet);
 
@@ -145,7 +145,7 @@ public class ChatServer
             String[] clientCiphers = ciphers.split(",");
             System.out.println("Ciphers: " + Arrays.toString(clientCiphers));
             System.out.println();
-            
+
             choice = "";
             int i = 0;
             String pick[] = new String[2];
@@ -161,7 +161,7 @@ public class ChatServer
                     }
                 }
             }
-            
+
             //Randomly picks a cipher suit to use
             choice += pick[(new Random()).nextInt(pick.length)];
 
@@ -179,28 +179,27 @@ public class ChatServer
             String keyString = keyToString(PUBLIC_KEY);
             String nonceString = encryptedNonce.toString();
             BigInteger message = ASCII.StringtoBigInt(choice + ';' + nonceString + ';' + keyString);
-            
+
             //Placees the nonce and cipher that was chosen back into a packet to be sent back to client
             packet = new Packet(NONCE, message);
-            
+
             //Adds packet to array list 
             PACKETS.add(packet);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
 
             //Step 3 of the handshake
-            
             //Receive Pre Master Secret
             String pmsString = incoming.readLine();
             System.out.println("Received: " + pmsString);
             System.out.println();
 
             packet = getPacket(pmsString);
-            
+
             //Adds packet to array list
             PACKETS.add(packet);
             BigInteger pmsInt = packet.getMessage();
-            
+
             //Decryts the pms using private key of the server
             BigInteger pms = PRIVATE_KEY.crypt(pmsInt);
 
@@ -208,10 +207,9 @@ public class ChatServer
             System.out.println();
 
             //Step 4 of the Handshake
-            
             //Create Encryption Keys: Kc, Mc, Ks, Ms          
             BigInteger encryptionBase = pms.multiply(NONCE).multiply(clientNonce);
-            
+
             //All of the encryption keys are different values of Big Integers
             int factorInt = 2;
             BigInteger factor = BigInteger.valueOf(factorInt);
@@ -255,7 +253,6 @@ public class ChatServer
             System.out.println();
 
             //Compares the MACs from the client and MACs from the server
-
             if (MACc.equals(packet.getMessage()))
             {
                 System.out.println("MAC check is equal. Secure connection established.");
@@ -335,7 +332,7 @@ public class ChatServer
                         connection.close();
                         break;
                     }
-                    
+
                     //Takes the first part of messageIn
                     messageIn = messageIn.substring(1);
                     Packet packet = getPacket(messageIn);
@@ -394,8 +391,7 @@ public class ChatServer
 
         return new Packet(sessionKey, message, signature);
     }
-    
-    
+
     /**
      * Converts a given packet to a String that can be sent over a network.
      *

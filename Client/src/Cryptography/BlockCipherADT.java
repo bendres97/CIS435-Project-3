@@ -1,8 +1,7 @@
 package Cryptography;
 
-
 /**
- *ADT for Block Cipher
+ * ADT for Block Cipher
  *
  * @author Bryan Endres ID: 8
  */

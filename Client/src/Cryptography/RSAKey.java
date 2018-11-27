@@ -1,6 +1,5 @@
 package Cryptography;
 
-
 import java.math.BigInteger;
 
 /**
@@ -51,7 +50,7 @@ public class RSAKey implements RSAKeyADT
     {
         return N.toString() + ", " + EXP.toString();
     }
-    
+
     public BigInteger crypt(BigInteger message)
     {
         return message.modPow(EXP, N);

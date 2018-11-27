@@ -1,8 +1,8 @@
 package Cryptography;
 
-
 /**
- * The Substitution Cipher encrypts and decrypts based on substituting values in the given string for a randomly generated set of values.
+ * The Substitution Cipher encrypts and decrypts based on substituting values in
+ * the given string for a randomly generated set of values.
  *
  * @author Bryan Endres ID: 8
  * @date 9-30-2018

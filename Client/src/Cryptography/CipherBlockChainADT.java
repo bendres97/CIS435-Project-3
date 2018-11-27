@@ -1,6 +1,5 @@
 package Cryptography;
 
-
 /**
  * ADT for Cipher Block Chain
  *

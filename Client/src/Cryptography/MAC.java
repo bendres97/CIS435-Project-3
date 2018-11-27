@@ -1,6 +1,5 @@
 package Cryptography;
 
-
 import java.math.BigInteger;
 
 /**
@@ -37,12 +36,12 @@ public class MAC implements MACADT
 
         return mac;
     }
-    
+
     public BigInteger authenticate(BigInteger msg, BigInteger secret)
     {
         String msgString = ASCII.BigIntToString(msg);
         String secretString = ASCII.BigIntToString(secret);
-        
+
         return authenticate(msgString, secretString);
     }
 
