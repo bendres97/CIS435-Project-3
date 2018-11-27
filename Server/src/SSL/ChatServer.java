@@ -344,7 +344,6 @@ public class ChatServer
             e.printStackTrace();
             System.exit(1);
         }
-
     }
 
     /**
@@ -365,7 +364,8 @@ public class ChatServer
 
         return new Packet(sessionKey, message, signature);
     }
-
+    
+    
     /**
      * Converts a given packet to a String that can be sent over a network.
      *
