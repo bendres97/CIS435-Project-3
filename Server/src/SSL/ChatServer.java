@@ -465,9 +465,9 @@ public class ChatServer
     }
 
     //Check the integrity of the message, only decrypt if authentic.
-    public static String getMessage(Packet packet, BigInteger Kc, int testCase)
+    public static String getMessage(Packet packet, BigInteger Ks, int testCase)
     {
-        String secret = ASCII.BigIntToString(Kc);
+        String secret = ASCII.BigIntToString(Ks);
         //Get and decrypt message
         BigInteger message = packet.getMessage();
         BigInteger decMsg = PRIVATE_KEY.crypt(message);
@@ -504,6 +504,7 @@ public class ChatServer
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
                     result = cbc.Decrypt(ASCII.BigIntToString(decMsg), IV);
+                    result = result.substring(1);   //Remove IV at front
                     break;
 
                 //Block Cipher + RSA + MAC + Digital Signature + CA

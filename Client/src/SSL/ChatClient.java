@@ -487,6 +487,7 @@ class ChatClient
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
                     result = cbc.Decrypt(ASCII.BigIntToString(decMsg), IV);
+                    result = result.substring(1);   //Remove IV at front
                     break;
 
                 //Block Cipher + RSA + MAC + Digital Signature + CA
