@@ -44,12 +44,13 @@ class ChatClient
      * This character is sent to the connected program when the user quits.
      */
     static final char CLOSE = '1';  //more like the type in SSL
-    
+
     static final Random RAND = new Random();
-    static final BigInteger NONCE = BigInteger.valueOf(RAND.nextInt());
+    static final BigInteger NONCE = BigInteger.valueOf(Math.abs(RAND.nextInt()));
     static final AsciiConverter ASCII = new AsciiConverter();
     static final Sender SENDER = new Sender();
     static final Receiver RECEIVER = new Receiver();
+    static final RSA RSA = new RSA();
 
     public static void main(String[] args)
     {
@@ -91,14 +92,62 @@ class ChatClient
             //BEGIN HANDSHAKING HERE
             //Send Cipher Suite
             BigInteger ciphers = ASCII.StringtoBigInt("1,2,3");
-            Packet packet = new Packet(NONCE,ciphers,new BigInteger("0"));
+            Packet packet = new Packet(NONCE, ciphers);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
+            
+            //Get Cipher Choice and Public Key
+            String packetString = incoming.readLine();
+            packet = getPacket(packetString);
+            BigInteger serverNonce = packet.getSessionKey();
+            BigInteger messageInt = packet.getMessage();
+            
+            System.out.println("Received: " + packetString);
+            
+            String[] message = ASCII.BigIntToString(messageInt).split(";");
+            String choice = message[0];
+            String nonceString = message[1];
+            String keyString = message[2];
+            
+            RSAKey serverPublicKey = keyFromString(keyString);
+            
+            System.out.println("Choice: " + choice);
+            System.out.println("Encrypted Nonce: " + nonceString);
+            System.out.println("Key: " + serverPublicKey.toString());
+            
+            //Verify Nonce
+            BigInteger encryptedNonce = new BigInteger(nonceString);
+            BigInteger nonce = serverPublicKey.crypt(encryptedNonce);
+            
+            if(NONCE.equals(nonce))
+            {
+                System.out.println("Authentication Passed");
+            }
+            
+            else
+            {
+                System.out.println("AUTHENTICATION FAILED");
+                connection.close();
+                System.exit(1);
+            }
+            
+            BigInteger pms = BigInteger.valueOf(Math.abs(RAND.nextInt()));
+            BigInteger encryptedPMS = serverPublicKey.crypt(pms);
+            
+            packet = new Packet(NONCE,encryptedPMS);
+            
+            //Send
+            System.out.println("Sending PMS to client: " + pms);
+            outgoing.println(preparePacket(packet));
+            outgoing.flush();
+            
+            
         }
         catch (Exception e)
         {
             System.out.println("An error occurred while opening connection.");
             System.out.println(e.toString());
+            e.printStackTrace();
             return;
         }
 
@@ -192,6 +241,36 @@ class ChatClient
         packetString += packet.getSignature().toString() + ';';
 
         return packetString;
+    }
+
+    /**
+     * Converts an RSA Key to a String representation
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param key The RSAKey
+     * @return the String Representation
+     */
+    public static String keyToString(RSAKey key)
+    {
+        return key.getEXP().toString() + "_" + key.getN().toString();
+    }
+
+    /**
+     * Converts an RSA Key String to an RSAKey
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param keyString The string to convert
+     * @return The RSAKey
+     */
+    public static RSAKey keyFromString(String keyString)
+    {
+        String[] keys = keyString.split("_");
+        BigInteger exp = new BigInteger(keys[0]);
+        BigInteger n = new BigInteger(keys[1]);
+
+        return new RSAKey(n, exp);
     }
 
 } //end class ChatClient

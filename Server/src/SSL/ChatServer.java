@@ -1,9 +1,7 @@
 package SSL;
 
-import Cryptography.AsciiConverter;
-import Network.Packet;
-import Network.Receiver;
-import Network.Sender;
+import Cryptography.*;
+import Network.*;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
@@ -48,13 +46,19 @@ public class ChatServer
      * This character is sent to the connected program when the user quits.
      */
     static final char CLOSE = '1'; //more like the type in SSL
-    
+
     static final Random RAND = new Random();
-    static final BigInteger NONCE = BigInteger.valueOf(RAND.nextInt());
+    static final BigInteger NONCE = BigInteger.valueOf(Math.abs(RAND.nextInt()));
     static final AsciiConverter ASCII = new AsciiConverter();
     static final Sender SENDER = new Sender();
     static final Receiver RECEIVER = new Receiver();
-    static final String[] CIPHERS = {"1","3","5"};
+    static final String[] CIPHERS =
+    {
+        "1", "3", "5"
+    };
+    static RSA RSA = new RSA();
+    static RSAKey PUBLIC_KEY = RSA.getPublicKey();
+    static RSAKey PRIVATE_KEY = RSA.getPrivateKey();
 
     public static void main(String[] args)
     {
@@ -96,30 +100,56 @@ public class ChatServer
             //Start of handshake////////////////////////////////
             ////////////////////////////////////////////////////
 
+            //Receive cipher suite
             String packetString = incoming.readLine();
             Packet packet = getPacket(packetString);
             System.out.println("Received:\t" + packetString);
             System.out.println("Packet:\t" + packet);
-            
+
             String[] clientCiphers = ASCII.BigIntToString(packet.getMessage()).split(",");
             System.out.println("Ciphers: " + Arrays.toString(clientCiphers));
-            String choice = "Unsupported";
-            
-            for(String cipher : clientCiphers)
+            String choice = "";
+
+            //Pick a cipher
+            for (String cipher : clientCiphers)
             {
-                for(String CIPHER : CIPHERS)
+                for (String CIPHER : CIPHERS)
                 {
-                    if(cipher.equals(CIPHER))
+                    if (cipher.equals(CIPHER))
+                    {
                         choice = cipher;
+                    }
                 }
             }
-            
-            if(choice.equals("Unsupported"))
+
+            //If no cipher is found
+            if (choice.equals(""))
             {
-                System.out.println("This client is not supported");
+                System.out.println("ERROR: This client is not supported");
                 connection.close();
                 System.exit(1);
             }
+
+            //Encrypt NONCE and send choice back along with public key
+            BigInteger encryptedNonce = PRIVATE_KEY.crypt(packet.getSessionKey());
+            String keyString = keyToString(PUBLIC_KEY);
+            String nonceString = encryptedNonce.toString();
+            BigInteger message = ASCII.StringtoBigInt(choice + ';' + nonceString + ';' + keyString);
+            packet = new Packet(NONCE, message);
+            outgoing.println(preparePacket(packet));
+            outgoing.flush();
+            
+            //Receive Pre Master Secret
+            
+            String pmsString = incoming.readLine();
+            System.out.println("Received: " + pmsString);
+            
+            packet = getPacket(pmsString);
+            BigInteger pmsInt = packet.getMessage();
+            BigInteger pms = PRIVATE_KEY.crypt(pmsInt);
+            
+            System.out.println("PMS: " + pms);
+
         }
         catch (Exception e)
         {
@@ -219,6 +249,36 @@ public class ChatServer
         packetString += packet.getSignature().toString() + ';';
 
         return packetString;
+    }
+
+    /**
+     * Converts an RSA Key to a String representation
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param key The RSAKey
+     * @return the String Representation
+     */
+    public static String keyToString(RSAKey key)
+    {
+        return key.getEXP().toString() + "_" + key.getN().toString();
+    }
+
+    /**
+     * Converts an RSA Key String to an RSAKey
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param keyString The string to convert
+     * @return The RSAKey
+     */
+    public static RSAKey keyFromString(String keyString)
+    {
+        String[] keys = keyString.split("_");
+        BigInteger exp = new BigInteger(keys[0]);
+        BigInteger n = new BigInteger(keys[1]);
+
+        return new RSAKey(n, exp);
     }
 
 } //end class ChatServer

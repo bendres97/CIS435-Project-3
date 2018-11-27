@@ -38,6 +38,11 @@ public class Packet implements PacketADT
         this.message = message;
         this.signature = signature;
     }
+    
+    public Packet(BigInteger nonce, BigInteger message)
+    {
+       this(nonce, message, BigInteger.ZERO);
+    }
 
     /**
      * Returns the session key
