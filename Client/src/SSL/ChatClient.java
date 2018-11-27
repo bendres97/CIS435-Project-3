@@ -20,10 +20,10 @@ import java.util.Random;
  * message. Note that the first character of any string sent over the connection
  * must be 0 or 1; this character is interpreted as a command for security
  * purpose.
- * 
+ *
  * @author Andrew Bradley
  * @author Bryan Endres
- * 
+ *
  */
 class ChatClient
 {
@@ -113,12 +113,10 @@ class ChatClient
             /////////////////////////////////////////////////////
             //Start of handshake////////////////////////////////
             ////////////////////////////////////////////////////
-            
             //Step 1 of the handshake
-            
             //Cases that the Client holds
             String ciphers = "1,2,3";
-            
+
             //Client suports the following cipher suits
             System.out.println("Client supports the following cipher suites:");
             System.out.println("\tCase 1: ShiftCipher + RSA + MAC"
@@ -130,24 +128,23 @@ class ChatClient
             String publicKeyString = keyToString(PUBLIC_KEY);
             String ciphers_Key = ciphers + ';' + publicKeyString;
             BigInteger ckInt = ASCII.StringtoBigInt(ciphers_Key);
-            
+
             //Adds the cipher key and Client nonce into a packet
             Packet packet = new Packet(NONCE, ckInt);
             PACKETS.add(packet);
-            
+
             //Sends the packet to server
             outgoing.println(preparePacket(packet));
             outgoing.flush();
 
             //Step 2 of the handshake
-            
             //Get Cipher Choice and Public Key
             String packetString = incoming.readLine();
             packet = getPacket(packetString);
-            
+
             //Adds packet into a queue
             PACKETS.add(packet);
-            
+
             //Retrieves the message and server nonce from packet
             BigInteger serverNonce = packet.getSessionKey();
             BigInteger messageInt = packet.getMessage();
@@ -169,11 +166,10 @@ class ChatClient
             System.out.println();
 
             //Step 3 of the handshake
-            
             //Verify the nonce using the server's public key
             BigInteger encryptedNonce = new BigInteger(nonceString);
             BigInteger nonce = serverPublicKey.crypt(encryptedNonce);
-            
+
             if (NONCE.equals(nonce))
             {
                 System.out.println("Authentication Passed");
@@ -192,7 +188,7 @@ class ChatClient
 
             //Sends the nonce and encrypted pre master key
             packet = new Packet(NONCE, encryptedPMS);
-            
+
             //put the packet into a list
             PACKETS.add(packet);
             System.out.println("Sending PMS to client: " + pms);
@@ -200,10 +196,9 @@ class ChatClient
             outgoing.flush();
 
             //Step 4 of the handshake
-            
             //Create Encryption Keys: Kc, Mc, Ks, Ms
             BigInteger encryptionBase = pms.multiply(NONCE).multiply(serverNonce);
-            
+
             //All of the encryption keys are different values of Big Integers 
             int factorInt = 2;
             BigInteger factor = BigInteger.valueOf(factorInt);
@@ -220,7 +215,6 @@ class ChatClient
             System.out.println();
 
             //Step 5 of the handshake
-            
             //Calculate the MAC values by using the Mc and Ms
             BigInteger packetSum = BigInteger.ZERO;
             for (Packet pkt : PACKETS)
@@ -235,7 +229,6 @@ class ChatClient
             System.out.println();
 
             //Step 7 of the handshake
-            
             //Send MACc to the server
             packet = new Packet(NONCE, MACc);
             outgoing.println(preparePacket(packet));
@@ -361,6 +354,7 @@ class ChatClient
         {
             System.out.println("Sorry, an error has occurred.  Connection lost.");
             System.out.println(e.toString());
+            e.printStackTrace();
             System.exit(1);
         }
 
@@ -434,12 +428,14 @@ class ChatClient
     }
 
     /**
-     * Encrypts the message using different forms of encryption then authenticates using MAC before sending the code
-     *@author Bryan Endres
+     * Encrypts the message using different forms of encryption then
+     * authenticates using MAC before sending the code
+     *
+     * @author Bryan Endres
      * @author Andrew Bradley
      * @param Message, test case, Kc, and RSAKey server public key
      * @return a packet
-     * 
+     *
      */
     public static Packet getMessagePacket(String message, int testCase, BigInteger Kc, RSAKey serverPublicKey)
     {
@@ -495,7 +491,8 @@ class ChatClient
     }
 
     /**
-     * Check the integrity of the message, only decrypt if  by comparing the two MAC.
+     * Check the integrity of the message, only decrypt if MAC is authentic.
+     *
      * @param packet
      * @param Ks
      * @param testCase

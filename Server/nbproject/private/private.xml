@@ -3,27 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/SenderADT.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/RSA.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/Signature.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/Sender.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/Packet.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/BlockCipherADT.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/CertificateAuthority.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/Certificate.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/MAC.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/DigitalSignature.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/User.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/Receiver.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/SecureMessageSystem.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/RSAKey.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/SSL/SSLRecord.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/BlockCipher.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/SignatureADT.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/PolyalphabeticCipher.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Cryptography/RSAADT.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/SSL/ChatServer.java</file>
-            <file>file:/C:/Users/apbra/CIS435-Project-3/Server/src/Network/Network.java</file>
+            <file>file:/C:/Users/bendr/Google%20Drive/Bradley/18FA/CIS%20435/Java%20Directory/Project%203/CIS435-Project-3/Server/src/SSL/ChatServer.java</file>
+            <file>file:/C:/Users/bendr/Google%20Drive/Bradley/18FA/CIS%20435/Java%20Directory/Project%203/CIS435-Project-3/Server/src/Network/SecureMessageSystem.java</file>
+            <file>file:/C:/Users/bendr/Google%20Drive/Bradley/18FA/CIS%20435/Java%20Directory/Project%203/CIS435-Project-3/Server/src/Network/Network.java</file>
         </group>
     </open-files>
 </project-private>

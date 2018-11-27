@@ -245,6 +245,7 @@ public class ChatServer
         {
             System.out.println("An error occurred while opening connection.");
             System.out.println(e.toString());
+            e.printStackTrace();
             return;
         }
 
@@ -285,6 +286,7 @@ public class ChatServer
             }
 
             SUB_KEY = substitutionKey;
+
             userInput = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("NOTE: Enter 'quit' to end the program.\n");
             while (true)
@@ -307,7 +309,7 @@ public class ChatServer
 
                     messageIn = messageIn.substring(1);
                     Packet packet = getPacket(messageIn);
-                    System.out.println("This is the packet that is taken in: " + packet);
+                    System.out.println("Received: " + packet);
                     recMsg = getMessage(packet, Kc, Integer.valueOf(choice));
 
                 }
@@ -339,6 +341,7 @@ public class ChatServer
         {
             System.out.println("Sorry, an error has occurred.  Connection lost.");
             System.out.println("Error:  " + e);
+            e.printStackTrace();
             System.exit(1);
         }
 
@@ -411,6 +414,16 @@ public class ChatServer
         return new RSAKey(n, exp);
     }
 
+    /**
+     * Encrypts the message using different forms of encryption then
+     * authenticates using MAC before sending the code
+     *
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     * @param Message, test case, Kc, and RSAKey server public key
+     * @return a packet
+     *
+     */
     public static Packet getMessagePacket(String message, int testCase, BigInteger Ks, RSAKey clientPublicKey)
     {
         String secret = ASCII.BigIntToString(Ks);
@@ -464,10 +477,17 @@ public class ChatServer
         return new Packet(NONCE, msg);
     }
 
-    //Check the integrity of the message, only decrypt if authentic.
-    public static String getMessage(Packet packet, BigInteger Ks, int testCase)
+    /**
+     * Check the integrity of the message, only decrypt if MAC is authentic.
+     *
+     * @param packet
+     * @param Ks
+     * @param testCase
+     * @return a string that gets printed out from either the client and server
+     */
+    public static String getMessage(Packet packet, BigInteger Kc, int testCase)
     {
-        String secret = ASCII.BigIntToString(Ks);
+        String secret = ASCII.BigIntToString(Kc);
         //Get and decrypt message
         BigInteger message = packet.getMessage();
         BigInteger decMsg = PRIVATE_KEY.crypt(message);
