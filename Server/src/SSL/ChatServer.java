@@ -59,6 +59,17 @@ public class ChatServer
     static RSAKey PUBLIC_KEY = RSA.getPublicKey();
     static RSAKey PRIVATE_KEY = RSA.getPrivateKey();
     static final ArrayList<Packet> PACKETS = new ArrayList<>();
+    static final MAC MAC = new MAC();
+
+    //Case Variables
+    private static final int CASE1 = 1;
+    private static final int CASE2 = 2;
+    private static final int CASE3 = 3;
+    private static final int CASE4 = 4;
+    private static final int CASE5 = 5;
+
+    static String IV;
+    static char[] SUB_KEY;
 
     public static void main(String[] args)
     {
@@ -167,41 +178,48 @@ public class ChatServer
             System.out.println("Mc:\t" + Mc);
             System.out.println("Ks:\t" + Ks);
             System.out.println("Ms:\t" + Ms);
-            
+
             //Calculate MAC values
             BigInteger packetSum = BigInteger.ZERO;
-            for(Packet pkt : PACKETS)
+            for (Packet pkt : PACKETS)
             {
                 packetSum = packetSum.add(pkt.getHashSum());
             }
-            
+
             BigInteger MACc = packetSum.mod(Mc);
             BigInteger MACs = packetSum.mod(Ms);
-            
+
             System.out.println("MACc: " + MACc);
             System.out.println("MACs: " + MACs);
-            
+
             //Send MACc
             packet = new Packet(NONCE, MACs);
             outgoing.println(preparePacket(packet));
             outgoing.flush();
-            
+
             //Receive MACc
             String MACc_rec = incoming.readLine();
             packet = getPacket(MACc_rec);
             System.out.println("Received MACc: " + packet.getMessage());
-            
-            if(MACc.equals(packet.getMessage()))
+
+            if (MACc.equals(packet.getMessage()))
             {
                 System.out.println("MAC check is equal. Secure connection established.");
             }
-            
+
             else
             {
                 System.out.println("ERROR: Insecure connection. Aborting");
                 connection.close();
                 System.exit(1);
             }
+
+            String firstMsg = incoming.readLine();
+            packet = getPacket(firstMsg);
+            
+            System.out.println(packet);
+            
+            System.out.println(getMessage(packet,Kc,Integer.valueOf(choice)));
 
         }
         catch (Exception e)
@@ -332,6 +350,120 @@ public class ChatServer
         BigInteger n = new BigInteger(keys[1]);
 
         return new RSAKey(n, exp);
+    }
+
+    public static Packet getMessagePacket(String message, int testCase, BigInteger Ks, RSAKey serverPublicKey)
+    {
+        String secret = ASCII.BigIntToString(Ks);
+        BigInteger msg = ASCII.StringtoBigInt(message);
+        switch (testCase)
+        {
+            //ShiftCipher + RSA + MAC+ Digital Signature + CA
+            case CASE1:
+                ShiftCipher shiftCipher = new ShiftCipher();
+                msg = shiftCipher.Encrypt(msg, ASCII.StringtoBigInt(secret));
+                break;
+
+            //SubsitutionCipher + RSA + Digital Signature + MAC + CA
+            case CASE2:
+                SubstitutionCipher subCipher = new SubstitutionCipher();
+                msg = ASCII.StringtoBigInt(subCipher.Encrypt(message, SUB_KEY));
+                break;
+
+            //PolyalphabeticCipher + RSA +Digital Signature + MAC + CA
+            case CASE3:
+                PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
+                msg = ASCII.StringtoBigInt(polyCipher.Encrypt(message, secret));
+                break;
+
+            //CBC + RSA + MAC + Digital Signature + CA
+            case CASE4:
+                CipherBlockChain cbc = new CipherBlockChain();
+                msg = ASCII.StringtoBigInt(cbc.Encrypt(message, IV));
+                break;
+
+            //Block Cipher + RSA + MAC + Digital Signature + CA
+            case CASE5:
+                BlockCipher block = new BlockCipher();
+                msg = ASCII.StringtoBigInt(block.Encrypt(message));
+                break;
+
+            //Default Case - Bad data is entered
+            default:
+                System.out.println("You have entered an invalid case");
+                return null;
+        }
+
+        //MAC
+        message = ASCII.BigIntToString(msg);
+        message = ASCII.BigIntToString(MAC.authenticate(message, secret));
+
+        //Encrypt with RSA
+        msg = ASCII.StringtoBigInt(message);
+        msg = msg.modPow(serverPublicKey.getEXP(), serverPublicKey.getN());
+
+        return new Packet(NONCE, msg);
+    }
+    
+    //Check the integrity of the message, only decrypt if authentic.
+    public static String getMessage(Packet packet, BigInteger Kc, int testCase)
+    {
+        String secret = ASCII.BigIntToString(Kc);
+        //Get and decrypt message
+        BigInteger message = packet.getMessage();
+        BigInteger decMsg = PRIVATE_KEY.crypt(message);
+
+        String result = "";
+
+        if (MAC.checkIntegrity(decMsg, secret))
+        {
+            String msgString = ASCII.BigIntToString(decMsg).substring(1);
+            decMsg = ASCII.StringtoBigInt(msgString);
+
+            System.out.println("Message is authentic");
+            switch (testCase)
+            {
+                //ShiftCipher + RSA + MAC + Digital Signature + CA
+                case CASE1:
+                    ShiftCipher shiftCipher = new ShiftCipher();
+                    result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, ASCII.StringtoBigInt(secret)));
+                    break;
+
+                //SubsitutionCipher + RSA + Digital Signature + MAC + CA
+                case CASE2:
+                    SubstitutionCipher subCipher = new SubstitutionCipher();
+                    result = subCipher.Decrypt(ASCII.BigIntToString(decMsg), SUB_KEY);
+                    break;
+
+                //PolyalphabeticCipher + RSA + MAC + CA
+                case CASE3:
+                    PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
+                    result = polyCipher.Decrypt(ASCII.BigIntToString(decMsg), secret);
+                    break;
+
+                //CBC + RSA + MAC + Digital Signature + CA
+                case CASE4:
+                    CipherBlockChain cbc = new CipherBlockChain();
+                    result = cbc.Decrypt(ASCII.BigIntToString(decMsg), IV);
+                    break;
+
+                //Block Cipher + RSA + MAC + Digital Signature + CA
+                case CASE5:
+                    BlockCipher block = new BlockCipher();
+                    result = block.Decrypt(ASCII.BigIntToString(decMsg));
+                    break;
+            }
+
+            System.out.println("Decrypted Result: " + result);
+
+        }
+        else
+        {
+            System.out.println("Message is not authentic");
+            return "NOT AUTHENTIC";
+        }
+
+        return result;
     }
 
 } //end class ChatServer
