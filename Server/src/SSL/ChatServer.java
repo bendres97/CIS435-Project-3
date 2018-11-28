@@ -51,17 +51,27 @@ public class ChatServer
      */
     static final char CLOSE = '1'; //more like the type in SSL
 
+    //Created a random nonce
     static final Random RAND = new Random();
     static final BigInteger NONCE = BigInteger.valueOf(Math.abs(RAND.nextInt()));
+    
+    //Initializes ASCII converter
     static final AsciiConverter ASCII = new AsciiConverter();
+    //Different cipher cases that are used
     static final String[] CIPHERS =
     {
         "2", "3", "4", "5"
     };
+    
+    //Creates RSA
     static RSA RSA = new RSA();
     static RSAKey PUBLIC_KEY = RSA.getPublicKey();
     static RSAKey PRIVATE_KEY = RSA.getPrivateKey();
+    
+    //Initializes arraylist packet
     static final ArrayList<Packet> PACKETS = new ArrayList<>();
+    
+    //nitialize mac
     static final MAC MAC = new MAC();
 
     //Case Variables
@@ -71,6 +81,7 @@ public class ChatServer
     private static final int CASE4 = 4;
     private static final int CASE5 = 5;
 
+    //Creates IV and sub key
     static String IV;
     static char[] SUB_KEY;
 

@@ -50,12 +50,21 @@ class ChatClient
      */
     static final char CLOSE = '1';  //more like the type in SSL
 
+    //Created a random nonce
     static final Random RAND = new Random();
     static final BigInteger NONCE = BigInteger.valueOf(Math.abs(RAND.nextInt()));
+    
+    //Initialize ASCII Converter
     static final AsciiConverter ASCII = new AsciiConverter();
-    static final RSA RSA = new RSA();
+    
+    //Create Packet array list
     static final ArrayList<Packet> PACKETS = new ArrayList<>();
+    
+    //Initialize MAC
     static final MAC MAC = new MAC();
+    
+    //Create RSA
+    static final RSA RSA = new RSA();
     static final RSAKey PUBLIC_KEY = RSA.getPublicKey();
     static final RSAKey PRIVATE_KEY = RSA.getPrivateKey();
 
