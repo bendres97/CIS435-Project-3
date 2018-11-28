@@ -75,7 +75,10 @@ class ChatClient
     private static final int CASE4 = 4;
     private static final int CASE5 = 5;
 
+    //Initialization Vector for CBC
     static String IV;
+    
+    //Substitution Key for Substitution Cipher
     static char[] SUB_KEY;
 
     public static void main(String[] args)
