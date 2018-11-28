@@ -115,13 +115,14 @@ class ChatClient
             ////////////////////////////////////////////////////
             //Step 1 of the handshake
             //Cases that the Client holds
-            String ciphers = "1,2,3";
+            String ciphers = "1,3,4,5";
 
             //Client suports the following cipher suits
             System.out.println("Client supports the following cipher suites:");
-            System.out.println("\tCase 1: ShiftCipher + RSA + MAC"
-                    + "\n\t" + "Case 2: SubstitutionCipher + RSA + MAC"
-                    + "\n\t" + "Case 3: PolyalphabeticCipher + RSA + MAC");
+            System.out.println("\tCase 1: ShiftCipher + MAC"
+                    + "\n\t" + "Case 3: PolyalphabeticCipher + MAC"
+                    + "\n\t" + "Case 4: Cipher Block Chain + MAC"
+                    + "\n\t" + "Case 5: Block Cipher + MAC");
             System.out.println();
 
             //Taking the public key of the client and concatenating with ciphers key 
@@ -489,7 +490,7 @@ class ChatClient
 
         //Encrypt with RSA
         msg = ASCII.StringtoBigInt(message);
-        msg = msg.modPow(serverPublicKey.getEXP(), serverPublicKey.getN());
+//        msg = msg.modPow(serverPublicKey.getEXP(), serverPublicKey.getN());
 
         return new Packet(NONCE, msg);
     }
@@ -507,47 +508,47 @@ class ChatClient
         String secret = ASCII.BigIntToString(Ks);
         //Get and decrypt message
         BigInteger message = packet.getMessage();
-        BigInteger decMsg = PRIVATE_KEY.crypt(message);
+//        BigInteger message = PRIVATE_KEY.crypt(message);
 
         String result = "";
 
-        if (MAC.checkIntegrity(decMsg, secret))
+        if (MAC.checkIntegrity(message, secret))
         {
-            String msgString = ASCII.BigIntToString(decMsg).substring(1);
-            decMsg = ASCII.StringtoBigInt(msgString);
+            String msgString = ASCII.BigIntToString(message).substring(1);
+            message = ASCII.StringtoBigInt(msgString);
 
             System.out.println("Message is authentic");
             switch (testCase)
             {
-                //ShiftCipher + RSA + MAC
+                //ShiftCipher + MAC
                 case CASE1:
                     ShiftCipher shiftCipher = new ShiftCipher();
-                    result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, Ks));
+                    result = ASCII.BigIntToString(shiftCipher.Decrypt(message, Ks));
                     break;
 
-                //SubsitutionCipher + RSA + MAC
+                //SubsitutionCipher + MAC
                 case CASE2:
                     SubstitutionCipher subCipher = new SubstitutionCipher();
-                    result = subCipher.Decrypt(ASCII.BigIntToString(decMsg), SUB_KEY);
+                    result = subCipher.Decrypt(ASCII.BigIntToString(message), SUB_KEY);
                     break;
 
-                //PolyalphabeticCipher + RSA + MAC
+                //PolyalphabeticCipher + MAC
                 case CASE3:
                     PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
-                    result = polyCipher.Decrypt(ASCII.BigIntToString(decMsg), secret);
+                    result = polyCipher.Decrypt(ASCII.BigIntToString(message), secret);
                     break;
 
-                //CBC + RSA + MAC
+                //CBC + MAC
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
-                    result = cbc.Decrypt(ASCII.BigIntToString(decMsg), IV);
+                    result = cbc.Decrypt(ASCII.BigIntToString(message), IV);
                     result = result.substring(1);   //Remove IV at front
                     break;
 
-                //Block Cipher + RSA + MAC
+                //Block Cipher + MAC
                 case CASE5:
                     BlockCipher block = new BlockCipher();
-                    result = block.Decrypt(ASCII.BigIntToString(decMsg));
+                    result = block.Decrypt(ASCII.BigIntToString(message));
                     break;
             }
 

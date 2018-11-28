@@ -22,7 +22,7 @@ import java.util.Random;
  * connection by entering the string "quit" when prompted for a message. Note
  * that the first character of any string sent over the connection must be 0 or
  * 1; this character is interpreted as a command for security purpose
- * 
+ *
  * @author Bryan Endres
  * @author Andrew Bradleys
  */
@@ -56,7 +56,7 @@ public class ChatServer
     static final AsciiConverter ASCII = new AsciiConverter();
     static final String[] CIPHERS =
     {
-        "1", "3", "5"
+        "2", "3", "4", "5"
     };
     static RSA RSA = new RSA();
     static RSAKey PUBLIC_KEY = RSA.getPublicKey();
@@ -130,9 +130,10 @@ public class ChatServer
 
             //Client suports the following cipher suits
             System.out.println("Server supports the following cipher suites:");
-            System.out.println("Case 1: ShiftCipher + RSA + MAC"
-                    + "\n\t" + "Case 2: PolyalphabeticCipher + RSA + MAC"
-                    + "\n\t" + "Case 5: Block Cipher + RSA + MAC");
+            System.out.println("\tCase 2: Substitution Cipher + MAC"
+                    + "\n\t" + "Case 3: PolyalphabeticCipher + MAC"
+                    + "\n\t" + "Case 4: Cipher Block Chain + MAC"
+                    + "\n\t" + "Case 5: Block Cipher + MAC");
             System.out.println();
 
             //Step 2 of the handshake
@@ -151,7 +152,7 @@ public class ChatServer
 
             choice = "";
             int i = 0;
-            String pick[] = new String[2];
+            String pick[] = new String[CIPHERS.length];
             //Pick a cipher out of the ciphers that were given from client and server
             for (String cipher : clientCiphers)
             {
@@ -462,31 +463,31 @@ public class ChatServer
         BigInteger msg = ASCII.StringtoBigInt(message);
         switch (testCase)
         {
-            //ShiftCipher + RSA + MAC
+            //ShiftCipher + MAC
             case CASE1:
                 ShiftCipher shiftCipher = new ShiftCipher();
                 msg = shiftCipher.Encrypt(msg, Ks);
                 break;
 
-            //SubsitutionCipher + RSA + MAC
+            //SubsitutionCipher + MAC
             case CASE2:
                 SubstitutionCipher subCipher = new SubstitutionCipher();
                 msg = ASCII.StringtoBigInt(subCipher.Encrypt(message, SUB_KEY));
                 break;
 
-            //PolyalphabeticCipher + RSA + MAC
+            //PolyalphabeticCipher + MAC
             case CASE3:
                 PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
                 msg = ASCII.StringtoBigInt(polyCipher.Encrypt(message, secret));
                 break;
 
-            //CBC + RSA + MAC
+            //CBC + MAC
             case CASE4:
                 CipherBlockChain cbc = new CipherBlockChain();
                 msg = ASCII.StringtoBigInt(cbc.Encrypt(message, IV));
                 break;
 
-            //Block Cipher + RSA + MAC
+            //Block Cipher + MAC
             case CASE5:
                 BlockCipher block = new BlockCipher();
                 msg = ASCII.StringtoBigInt(block.Encrypt(message));
@@ -504,7 +505,7 @@ public class ChatServer
 
         //Encrypt with RSA
         msg = ASCII.StringtoBigInt(message);
-        msg = msg.modPow(clientPublicKey.getEXP(), clientPublicKey.getN());
+//        msg = msg.modPow(clientPublicKey.getEXP(), clientPublicKey.getN());
 
         return new Packet(NONCE, msg);
     }
@@ -522,47 +523,47 @@ public class ChatServer
         String secret = ASCII.BigIntToString(Kc);
         //Get and decrypt message
         BigInteger message = packet.getMessage();
-        BigInteger decMsg = PRIVATE_KEY.crypt(message);
+//        BigInteger message = PRIVATE_KEY.crypt(message);
 
         String result = "";
 
-        if (MAC.checkIntegrity(decMsg, secret))
+        if (MAC.checkIntegrity(message, secret))
         {
-            String msgString = ASCII.BigIntToString(decMsg).substring(1);
-            decMsg = ASCII.StringtoBigInt(msgString);
+            String msgString = ASCII.BigIntToString(message).substring(1);
+            message = ASCII.StringtoBigInt(msgString);
 
             System.out.println("Message is authentic");
             switch (testCase)
             {
-                //ShiftCipher + RSA + MAC
+                //ShiftCipher + MAC
                 case CASE1:
                     ShiftCipher shiftCipher = new ShiftCipher();
-                    result = ASCII.BigIntToString(shiftCipher.Decrypt(decMsg, Kc));
+                    result = ASCII.BigIntToString(shiftCipher.Decrypt(message, Kc));
                     break;
 
-                //SubsitutionCipher + RSA + MAC
+                //SubsitutionCipher + MAC
                 case CASE2:
                     SubstitutionCipher subCipher = new SubstitutionCipher();
-                    result = subCipher.Decrypt(ASCII.BigIntToString(decMsg), SUB_KEY);
+                    result = subCipher.Decrypt(ASCII.BigIntToString(message), SUB_KEY);
                     break;
 
-                //PolyalphabeticCipher + RSA + MAC
+                //PolyalphabeticCipher + MAC
                 case CASE3:
                     PolyalphabeticCipher polyCipher = new PolyalphabeticCipher();
-                    result = polyCipher.Decrypt(ASCII.BigIntToString(decMsg), secret);
+                    result = polyCipher.Decrypt(ASCII.BigIntToString(message), secret);
                     break;
 
-                //CBC + RSA + MAC
+                //CBC + MAC
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
-                    result = cbc.Decrypt(ASCII.BigIntToString(decMsg), IV);
+                    result = cbc.Decrypt(ASCII.BigIntToString(message), IV);
                     result = result.substring(1);   //Remove IV at front
                     break;
 
-                //Block Cipher + RSA + MAC
+                //Block Cipher + MAC
                 case CASE5:
                     BlockCipher block = new BlockCipher();
-                    result = block.Decrypt(ASCII.BigIntToString(decMsg));
+                    result = block.Decrypt(ASCII.BigIntToString(message));
                     break;
             }
 
