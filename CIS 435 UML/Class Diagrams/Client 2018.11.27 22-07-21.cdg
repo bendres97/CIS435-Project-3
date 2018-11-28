@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ClassDiagram name="Client">
+  <ClassDiagramComponents>
+    <Class name="AsciiConverter" package="Cryptography" visibility="public" xPosition="20.0" yPosition="20.0">
+      <Fields/>
+      <Constructors/>
+      <Methods>
+        <Method name="StringtoBigInt" returnType="BigInteger" visibility="public">
+          <Argument type="String" name="inStr"/>
+        </Method>
+        <Method name="BigIntToString" returnType="String" visibility="public">
+          <Argument type="BigInteger" name="inBigInt"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="BlockCipher" package="Cryptography" visibility="public" xPosition="620.0" yPosition="20.0">
+      <Fields>
+        <Field name="encryptionMap" type="Map&lt;String, String&gt;" visibility="package"/>
+        <Field name="decryptionMap" type="Map&lt;String, String&gt;" visibility="package"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="output"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="Certificate" package="Cryptography" visibility="public" xPosition="1220.0" yPosition="20.0">
+      <Fields>
+        <Field name="CA_KEY" type="RSAKey" visibility="private" isFinal="true"/>
+        <Field name="USER_KEY" type="RSAKey" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public">
+          <Argument type="RSAKey" name="userKey"/>
+          <Argument type="RSAKey" name="keyCA"/>
+        </Constructor>
+      </Constructors>
+      <Methods>
+        <Method name="getCAKey" returnType="RSAKey" visibility="public"/>
+        <Method name="getUserKey" returnType="RSAKey" visibility="public"/>
+        <Method name="decryptCertificate" returnType="RSAKey" visibility="public" isStatic="true">
+          <Argument type="Certificate" name="certificate"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="CertificateAuthority" package="Cryptography" visibility="public" xPosition="1754.0" yPosition="20.0">
+      <Fields>
+        <Field name="BIT_LENGTH" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CERTIFICATES" type="HashMap&lt;Receiver, Certificate&gt;" visibility="private" isFinal="true"/>
+        <Field name="RSA_OBJ" type="RSA" visibility="private" isStatic="true" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="getCertificate" returnType="Certificate" visibility="public">
+          <Argument type="Receiver" name="receiver"/>
+        </Method>
+        <Method name="register" returnType="void" visibility="public">
+          <Argument type="Receiver" name="receiver"/>
+        </Method>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+      </Methods>
+    </Class>
+    <Class name="CipherBlockChain" package="Cryptography" visibility="public" xPosition="20.0" yPosition="420.0">
+      <Fields>
+        <Field name="ENCRYPTION_MAP" type="Map&lt;String, String&gt;" visibility="private" isFinal="true"/>
+        <Field name="DECRYPTION_MAP" type="Map&lt;String, String&gt;" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+          <Argument type="String" name="IV"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+          <Argument type="String" name="IV"/>
+        </Method>
+        <Method name="XOR" returnType="String" visibility="private">
+          <Argument type="String" name="a"/>
+          <Argument type="String" name="b"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="DigitalSignature" package="Cryptography" visibility="public" xPosition="620.0" yPosition="420.0">
+      <Fields>
+        <Field name="HASH_VALUE" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="RSA" type="RSA" visibility="private" isFinal="true"/>
+        <Field name="ASCII" type="AsciiConverter" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="sign" returnType="Signature" visibility="public">
+          <Argument type="String" name="msg"/>
+        </Method>
+        <Method name="authenticate" returnType="boolean" visibility="public">
+          <Argument type="Signature" name="signature"/>
+        </Method>
+        <Method name="authenticate" returnType="boolean" visibility="public">
+          <Argument type="BigInteger" name="hash"/>
+          <Argument type="BigInteger" name="message"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="MAC" package="Cryptography" visibility="public" xPosition="1220.0" yPosition="420.0">
+      <Fields>
+        <Field name="HASH" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="ASCII" type="AsciiConverter" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="HASH_KEY" type="int" visibility="private" isStatic="true" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="authenticate" returnType="BigInteger" visibility="public">
+          <Argument type="String" name="msg"/>
+          <Argument type="String" name="secret"/>
+        </Method>
+        <Method name="authenticate" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="msg"/>
+          <Argument type="BigInteger" name="secret"/>
+        </Method>
+        <Method name="checkIntegrity" returnType="boolean" visibility="public">
+          <Argument type="BigInteger" name="msg"/>
+          <Argument type="String" name="secret"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="PolyalphabeticCipher" package="Cryptography" visibility="public" xPosition="1820.0" yPosition="420.0">
+      <Fields>
+        <Field name="ASCII_MAX" type="int" visibility="private" isStatic="true" isFinal="true"/>
+      </Fields>
+      <Constructors/>
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="msg"/>
+          <Argument type="String" name="shift"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="msg"/>
+          <Argument type="String" name="shift"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="RSA" package="Cryptography" visibility="public" xPosition="20.0" yPosition="820.0">
+      <Fields>
+        <Field name="N" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="E" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="D" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="BIT_LENGTH" type="int" visibility="private" isFinal="true"/>
+        <Field name="PUBLIC_KEY" type="RSAKey" visibility="private" isFinal="true"/>
+        <Field name="PRIVATE_KEY" type="RSAKey" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+        <Constructor visibility="public">
+          <Argument type="BigInteger" name="e"/>
+          <Argument type="BigInteger" name="d"/>
+          <Argument type="BigInteger" name="n"/>
+        </Constructor>
+        <Constructor visibility="public">
+          <Argument type="int" name="bitLength"/>
+        </Constructor>
+      </Constructors>
+      <Methods>
+        <Method name="Encrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="msg"/>
+        </Method>
+        <Method name="Decrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="cipherIn"/>
+        </Method>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+        <Method name="getPrivateKey" returnType="RSAKey" visibility="public"/>
+      </Methods>
+    </Class>
+    <Class name="RSAKey" package="Cryptography" visibility="public" xPosition="620.0" yPosition="820.0">
+      <Fields>
+        <Field name="N" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="EXP" type="BigInteger" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public">
+          <Argument type="BigInteger" name="n"/>
+          <Argument type="BigInteger" name="exp"/>
+        </Constructor>
+      </Constructors>
+      <Methods>
+        <Method name="getN" returnType="BigInteger" visibility="public"/>
+        <Method name="getEXP" returnType="BigInteger" visibility="public"/>
+        <Method name="equals" returnType="boolean" visibility="public">
+          <Argument type="RSAKey" name="that"/>
+        </Method>
+        <Method name="toString" returnType="String" visibility="public"/>
+        <Method name="crypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="message"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="ShiftCipher" package="Cryptography" visibility="public" xPosition="1220.0" yPosition="820.0">
+      <Fields/>
+      <Constructors/>
+      <Methods>
+        <Method name="Encrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="msg"/>
+          <Argument type="BigInteger" name="shift"/>
+        </Method>
+        <Method name="Decrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="cipher"/>
+          <Argument type="BigInteger" name="shift"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="Signature" package="Cryptography" visibility="public" xPosition="1820.0" yPosition="820.0">
+      <Fields>
+        <Field name="ENCRYPTED_HASH" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="MESSAGE" type="BigInteger" visibility="private" isFinal="true"/>
+        <Field name="PUBLIC_KEY" type="RSAKey" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public">
+          <Argument type="BigInteger" name="encryptedHash"/>
+          <Argument type="BigInteger" name="message"/>
+          <Argument type="RSAKey" name="publicKey"/>
+        </Constructor>
+      </Constructors>
+      <Methods>
+        <Method name="getEncryptedHash" returnType="BigInteger" visibility="public"/>
+        <Method name="getMessage" returnType="BigInteger" visibility="public"/>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+      </Methods>
+    </Class>
+    <Class name="SubstitutionCipher" package="Cryptography" visibility="public" xPosition="20.0" yPosition="1220.0">
+      <Fields/>
+      <Constructors/>
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+          <Argument type="char[]" name="substitutionKey"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="cryptInput"/>
+          <Argument type="char[]" name="substitutionKey"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="User" package="Cryptography" visibility="public" xPosition="683.0" yPosition="1220.0">
+      <Fields>
+        <Field name="rsa" type="RSA" visibility="private" isFinal="true"/>
+        <Field name="name" type="String" visibility="private" isFinal="true"/>
+        <Field name="id" type="int" visibility="private" isFinal="true"/>
+        <Field name="id_counter" type="int" visibility="private" isStatic="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+        <Constructor visibility="public">
+          <Argument type="String" name="name"/>
+        </Constructor>
+      </Constructors>
+      <Methods>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+        <Method name="getID" returnType="int" visibility="public"/>
+        <Method name="getName" returnType="String" visibility="public"/>
+      </Methods>
+    </Class>
+    <Class name="Network" package="Network" visibility="public" xPosition="1220.0" yPosition="1220.0">
+      <Fields>
+        <Field name="inFromSender" type="Packet" visibility="private"/>
+        <Field name="CA" type="CertificateAuthority" visibility="public" isStatic="true" isFinal="true"/>
+        <Field name="MAC" type="MAC" visibility="public" isStatic="true" isFinal="true"/>
+        <Field name="DS" type="DigitalSignature" visibility="public" isStatic="true" isFinal="true"/>
+        <Field name="IV" type="String" visibility="private" isFinal="true"/>
+        <Field name="SUB_KEY" type="char[]" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="sendToReceiver" returnType="void" visibility="public">
+          <Argument type="Packet" name="pk"/>
+        </Method>
+        <Method name="setInternetCondition" returnType="void" visibility="public">
+          <Argument type="int" name="error"/>
+        </Method>
+        <Method name="receiveFromSender" returnType="Packet" visibility="public"/>
+        <Method name="getIV" returnType="String" visibility="public"/>
+        <Method name="getSubKey" returnType="char[]" visibility="public"/>
+      </Methods>
+    </Class>
+    <Class name="Packet" package="Network" visibility="public" xPosition="1820.0" yPosition="1220.0">
+      <Fields>
+        <Field name="sessionKey" type="BigInteger" visibility="private"/>
+        <Field name="message" type="BigInteger" visibility="private"/>
+        <Field name="signature" type="BigInteger" visibility="private"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+        <Constructor visibility="public">
+          <Argument type="BigInteger" name="sessionKey"/>
+          <Argument type="BigInteger" name="message"/>
+          <Argument type="BigInteger" name="signature"/>
+        </Constructor>
+        <Constructor visibility="public">
+          <Argument type="BigInteger" name="nonce"/>
+          <Argument type="BigInteger" name="message"/>
+        </Constructor>
+      </Constructors>
+      <Methods>
+        <Method name="getSessionKey" returnType="BigInteger" visibility="public"/>
+        <Method name="setSessionKey" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="sessionKey"/>
+        </Method>
+        <Method name="getMessage" returnType="BigInteger" visibility="public"/>
+        <Method name="setMessage" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="message"/>
+        </Method>
+        <Method name="setErrorInMessage" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="error"/>
+        </Method>
+        <Method name="getSignature" returnType="BigInteger" visibility="public"/>
+        <Method name="setSignature" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="signature"/>
+        </Method>
+        <Method name="toString" returnType="String" visibility="public"/>
+        <Method name="getHashSum" returnType="BigInteger" visibility="public"/>
+      </Methods>
+    </Class>
+    <Class name="Receiver" package="Network" visibility="public" xPosition="20.0" yPosition="1620.0">
+      <Fields>
+        <Field name="rcvPacket" type="Packet" visibility="private"/>
+        <Field name="CERT" type="Certificate" visibility="private" isFinal="true"/>
+        <Field name="RSA" type="RSA" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="receive" returnType="Packet" visibility="public">
+          <Argument type="Network" name="net"/>
+        </Method>
+        <Method name="getCertificate" returnType="Certificate" visibility="public"/>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+        <Method name="decryptMessage" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="message"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="SecureMessageSystem" package="Network" visibility="public" xPosition="620.0" yPosition="1620.0">
+      <Fields>
+        <Field name="CASE1" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE2" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE3" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE4" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE5" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="ASCII" type="AsciiConverter" visibility="private" isStatic="true" isFinal="true"/>
+      </Fields>
+      <Constructors/>
+      <Methods>
+        <Method name="main" returnType="void" visibility="public" isStatic="true">
+          <Argument type="String[]" name="args"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Class name="Sender" package="Network" visibility="public" xPosition="920.0" yPosition="1620.0">
+      <Fields>
+        <Field name="CASE1" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE2" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE3" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE4" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE5" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="ASCII" type="AsciiConverter" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="SECRET" type="String" visibility="private" isFinal="true"/>
+      </Fields>
+      <Constructors>
+        <Constructor visibility="public"/>
+      </Constructors>
+      <Methods>
+        <Method name="getPacket" returnType="Packet" visibility="public">
+          <Argument type="int" name="testCase"/>
+          <Argument type="Network" name="net"/>
+          <Argument type="Receiver" name="rec"/>
+        </Method>
+        <Method name="generateMessage" returnType="BigInteger" visibility="public">
+          <Argument type="int" name="testCase"/>
+          <Argument type="Network" name="net"/>
+          <Argument type="Receiver" name="rec"/>
+        </Method>
+        <Method name="getSecret" returnType="String" visibility="public"/>
+      </Methods>
+    </Class>
+    <Class name="ChatClient" package="SSL" visibility="public" xPosition="1475.0" yPosition="1620.0">
+      <Fields>
+        <Field name="DEFAULT_PORT" type="int" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="HANDSHAKE" type="String" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="MESSAGE" type="char" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="CLOSE" type="char" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="RAND" type="Random" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="NONCE" type="BigInteger" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="ASCII" type="AsciiConverter" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="PACKETS" type="ArrayList&lt;Packet&gt;" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="MAC" type="MAC" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="RSA" type="RSA" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="PUBLIC_KEY" type="RSAKey" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="PRIVATE_KEY" type="RSAKey" visibility="package" isStatic="true" isFinal="true"/>
+        <Field name="CASE1" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE2" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE3" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE4" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="CASE5" type="int" visibility="private" isStatic="true" isFinal="true"/>
+        <Field name="IV" type="String" visibility="package" isStatic="true"/>
+        <Field name="SUB_KEY" type="char[]" visibility="package" isStatic="true"/>
+      </Fields>
+      <Constructors/>
+      <Methods>
+        <Method name="main" returnType="void" visibility="public" isStatic="true">
+          <Argument type="String[]" name="args"/>
+        </Method>
+        <Method name="getPacket" returnType="Packet" visibility="public" isStatic="true">
+          <Argument type="String" name="incoming"/>
+        </Method>
+        <Method name="preparePacket" returnType="String" visibility="public" isStatic="true">
+          <Argument type="Packet" name="packet"/>
+        </Method>
+        <Method name="keyToString" returnType="String" visibility="public" isStatic="true">
+          <Argument type="RSAKey" name="key"/>
+        </Method>
+        <Method name="keyFromString" returnType="RSAKey" visibility="public" isStatic="true">
+          <Argument type="String" name="keyString"/>
+        </Method>
+        <Method name="getMessagePacket" returnType="Packet" visibility="public" isStatic="true">
+          <Argument type="String" name="message"/>
+          <Argument type="int" name="testCase"/>
+          <Argument type="BigInteger" name="Kc"/>
+          <Argument type="RSAKey" name="serverPublicKey"/>
+        </Method>
+        <Method name="getMessage" returnType="String" visibility="public" isStatic="true">
+          <Argument type="Packet" name="packet"/>
+          <Argument type="BigInteger" name="Ks"/>
+          <Argument type="int" name="testCase"/>
+        </Method>
+      </Methods>
+    </Class>
+    <Interface name="AsciiConverterADT" package="Cryptography" visibility="public" xPosition="320.0" yPosition="20.0">
+      <Methods>
+        <Method name="StringtoBigInt" returnType="BigInteger" visibility="public">
+          <Argument type="String" name="inStr"/>
+        </Method>
+        <Method name="BigIntToString" returnType="String" visibility="public">
+          <Argument type="BigInteger" name="inBigInt"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="BlockCipherADT" package="Cryptography" visibility="public" xPosition="920.0" yPosition="20.0">
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="output"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="CertificateADT" package="Cryptography" visibility="public" xPosition="1520.0" yPosition="20.0">
+      <Methods>
+        <Method name="getCAKey" returnType="RSAKey" visibility="public"/>
+        <Method name="getUserKey" returnType="RSAKey" visibility="public"/>
+      </Methods>
+    </Interface>
+    <Interface name="CertificateAuthorityADT" package="Cryptography" visibility="public" xPosition="2120.0" yPosition="20.0">
+      <Methods>
+        <Method name="getCertificate" returnType="Certificate" visibility="public">
+          <Argument type="Receiver" name="receiver"/>
+        </Method>
+        <Method name="register" returnType="void" visibility="public">
+          <Argument type="Receiver" name="receiver"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="CipherBlockChainADT" package="Cryptography" visibility="public" xPosition="320.0" yPosition="420.0">
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+          <Argument type="String" name="IV"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+          <Argument type="String" name="IV"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="DigitalSignatureADT" package="Cryptography" visibility="public" xPosition="881.0" yPosition="236.0">
+      <Methods>
+        <Method name="sign" returnType="Signature" visibility="public">
+          <Argument type="String" name="msg"/>
+        </Method>
+        <Method name="authenticate" returnType="boolean" visibility="public">
+          <Argument type="Signature" name="signature"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="MACADT" package="Cryptography" visibility="public" xPosition="1520.0" yPosition="275.0">
+      <Methods>
+        <Method name="authenticate" returnType="BigInteger" visibility="public">
+          <Argument type="String" name="msg"/>
+          <Argument type="String" name="secret"/>
+        </Method>
+        <Method name="checkIntegrity" returnType="boolean" visibility="public">
+          <Argument type="BigInteger" name="msg"/>
+          <Argument type="String" name="secret"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="PolyalphabeticCipherADT" package="Cryptography" visibility="public" xPosition="2120.0" yPosition="420.0">
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="msg"/>
+          <Argument type="String" name="shift"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="msg"/>
+          <Argument type="String" name="shift"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="RSAADT" package="Cryptography" visibility="public" xPosition="320.0" yPosition="820.0">
+      <Methods>
+        <Method name="Encrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="msg"/>
+        </Method>
+        <Method name="Decrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="cipherIn"/>
+        </Method>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+        <Method name="getPrivateKey" returnType="RSAKey" visibility="public"/>
+      </Methods>
+    </Interface>
+    <Interface name="RSAKeyADT" package="Cryptography" visibility="public" xPosition="920.0" yPosition="820.0">
+      <Methods>
+        <Method name="getN" returnType="BigInteger" visibility="public"/>
+        <Method name="getEXP" returnType="BigInteger" visibility="public"/>
+        <Method name="equals" returnType="boolean" visibility="public">
+          <Argument type="RSAKey" name="that"/>
+        </Method>
+        <Method name="toString" returnType="String" visibility="public"/>
+      </Methods>
+    </Interface>
+    <Interface name="ShiftCipherADT" package="Cryptography" visibility="public" xPosition="1545.0" yPosition="673.0">
+      <Methods>
+        <Method name="Encrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="msg"/>
+          <Argument type="BigInteger" name="shift"/>
+        </Method>
+        <Method name="Decrypt" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="cipher"/>
+          <Argument type="BigInteger" name="shift"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="SignatureADT" package="Cryptography" visibility="public" xPosition="2092.0" yPosition="664.0">
+      <Methods>
+        <Method name="getEncryptedHash" returnType="BigInteger" visibility="public"/>
+        <Method name="getMessage" returnType="BigInteger" visibility="public"/>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+      </Methods>
+    </Interface>
+    <Interface name="SubstitutionCipherADT" package="Cryptography" visibility="public" xPosition="348.0" yPosition="1220.0">
+      <Methods>
+        <Method name="Encrypt" returnType="String" visibility="public">
+          <Argument type="String" name="input"/>
+          <Argument type="char[]" name="substitutionKey"/>
+        </Method>
+        <Method name="Decrypt" returnType="String" visibility="public">
+          <Argument type="String" name="cryptInput"/>
+          <Argument type="char[]" name="substitutionKey"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="UserADT" package="Cryptography" visibility="public" xPosition="920.0" yPosition="1220.0">
+      <Methods>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+        <Method name="getID" returnType="int" visibility="public"/>
+        <Method name="getName" returnType="String" visibility="public"/>
+      </Methods>
+    </Interface>
+    <Interface name="NetworkADT" package="Network" visibility="public" xPosition="1520.0" yPosition="1220.0">
+      <Methods>
+        <Method name="sendToReceiver" returnType="void" visibility="public">
+          <Argument type="Packet" name="pk"/>
+        </Method>
+        <Method name="setInternetCondition" returnType="void" visibility="public">
+          <Argument type="int" name="error"/>
+        </Method>
+        <Method name="receiveFromSender" returnType="Packet" visibility="public"/>
+      </Methods>
+    </Interface>
+    <Interface name="PacketADT" package="Network" visibility="public" xPosition="2194.0" yPosition="1654.0">
+      <Methods>
+        <Method name="getSessionKey" returnType="BigInteger" visibility="public"/>
+        <Method name="setSessionKey" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="sessionKey"/>
+        </Method>
+        <Method name="getMessage" returnType="BigInteger" visibility="public"/>
+        <Method name="setMessage" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="message"/>
+        </Method>
+        <Method name="setErrorInMessage" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="error"/>
+        </Method>
+        <Method name="getSignature" returnType="BigInteger" visibility="public"/>
+        <Method name="setSignature" returnType="void" visibility="public">
+          <Argument type="BigInteger" name="signature"/>
+        </Method>
+        <Method name="toString" returnType="String" visibility="public"/>
+      </Methods>
+    </Interface>
+    <Interface name="ReceiverADT" package="Network" visibility="public" xPosition="320.0" yPosition="1620.0">
+      <Methods>
+        <Method name="receive" returnType="Packet" visibility="public">
+          <Argument type="Network" name="net"/>
+        </Method>
+        <Method name="getCertificate" returnType="Certificate" visibility="public"/>
+        <Method name="getPublicKey" returnType="RSAKey" visibility="public"/>
+        <Method name="decryptMessage" returnType="BigInteger" visibility="public">
+          <Argument type="BigInteger" name="message"/>
+        </Method>
+      </Methods>
+    </Interface>
+    <Interface name="SenderADT" package="Network" visibility="public" xPosition="446.0" yPosition="1973.0">
+      <Methods>
+        <Method name="getPacket" returnType="Packet" visibility="public">
+          <Argument type="int" name="testCase"/>
+          <Argument type="Network" name="net"/>
+          <Argument type="Receiver" name="rec"/>
+        </Method>
+        <Method name="generateMessage" returnType="BigInteger" visibility="public">
+          <Argument type="int" name="testCase"/>
+          <Argument type="Network" name="net"/>
+          <Argument type="Receiver" name="rec"/>
+        </Method>
+        <Method name="getSecret" returnType="String" visibility="public"/>
+      </Methods>
+    </Interface>
+  </ClassDiagramComponents>
+  <ClassDiagramRelations>
+    <UseRelation source="Cryptography.RSAKeyADT" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="SSL.ChatClient" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="PRIVATE_KEY" source="Cryptography.RSA" target="Cryptography.RSAKey" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="ASCII" source="Network.Sender" target="Cryptography.AsciiConverter" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.Receiver" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.Receiver" target="Cryptography.Certificate" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Network.Network" target="Network.NetworkADT"/>
+    <UseRelation source="Cryptography.RSAKey" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.Certificate" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="RSA_OBJ" source="Cryptography.CertificateAuthority" target="Cryptography.RSA" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="ASCII" source="SSL.ChatClient" target="Cryptography.AsciiConverter" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.Certificate" target="Cryptography.CertificateADT"/>
+    <HasRelation name="ASCII" source="Cryptography.DigitalSignature" target="Cryptography.AsciiConverter" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="PACKETS" source="SSL.ChatClient" target="Network.Packet" type="Aggregation" sourceCardinality="1..1" targetCardinality="0..*" collectionType="ArrayList&lt;Packet&gt;"/>
+    <UseRelation source="Cryptography.DigitalSignatureADT" target="Cryptography.Signature" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="CA_KEY" source="Cryptography.Certificate" target="Cryptography.RSAKey" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.User" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.ReceiverADT" target="Cryptography.Certificate" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="PUBLIC_KEY" source="Cryptography.RSA" target="Cryptography.RSAKey" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="inFromSender" source="Network.Network" target="Network.Packet" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="CERTIFICATES" source="Cryptography.CertificateAuthority" target="Network.Receiver" type="Aggregation" sourceCardinality="1..1" targetCardinality="0..*" collectionType="HashMap&lt;Receiver, Certificate&gt;"/>
+    <HasRelation name="RSA" source="Cryptography.DigitalSignature" target="Cryptography.RSA" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.RSA" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.ReceiverADT" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.User" target="Cryptography.UserADT"/>
+    <HasRelation name="ASCII" source="Network.SecureMessageSystem" target="Cryptography.AsciiConverter" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="CERT" source="Network.Receiver" target="Cryptography.Certificate" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.DigitalSignature" target="Cryptography.Signature" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="RSA" source="SSL.ChatClient" target="Cryptography.RSA" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.SenderADT" target="Network.Receiver" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="PRIVATE_KEY" source="SSL.ChatClient" target="Cryptography.RSAKey" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="USER_KEY" source="Cryptography.Certificate" target="Cryptography.RSAKey" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="DS" source="Network.Network" target="Cryptography.DigitalSignature" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.NetworkADT" target="Network.Packet" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.CipherBlockChain" target="Cryptography.CipherBlockChainADT"/>
+    <HasRelation name="rcvPacket" source="Network.Receiver" target="Network.Packet" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.MAC" target="Cryptography.MACADT"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.RSA" target="Cryptography.RSAADT"/>
+    <HasRelation name="MAC" source="SSL.ChatClient" target="Cryptography.MAC" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="SSL.ChatClient" target="Network.Packet" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.PolyalphabeticCipher" target="Cryptography.PolyalphabeticCipherADT"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Network.Receiver" target="Network.ReceiverADT"/>
+    <UseRelation source="Network.ReceiverADT" target="Network.Packet" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.CertificateAuthority" target="Cryptography.CertificateAuthorityADT"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.SubstitutionCipher" target="Cryptography.SubstitutionCipherADT"/>
+    <UseRelation source="Cryptography.CertificateAuthority" target="Network.Receiver" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="PUBLIC_KEY" source="SSL.ChatClient" target="Cryptography.RSAKey" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Network.Sender" target="Network.SenderADT"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.DigitalSignature" target="Cryptography.DigitalSignatureADT"/>
+    <HasRelation name="RSA" source="Network.Receiver" target="Cryptography.RSA" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.SignatureADT" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="ASCII" source="Cryptography.MAC" target="Cryptography.AsciiConverter" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="PUBLIC_KEY" source="Cryptography.Signature" target="Cryptography.RSAKey" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.CertificateADT" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.Sender" target="Network.Receiver" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.UserADT" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.Signature" target="Cryptography.SignatureADT"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.RSAKey" target="Cryptography.RSAKeyADT"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.AsciiConverter" target="Cryptography.AsciiConverterADT"/>
+    <HasRelation name="rsa" source="Cryptography.User" target="Cryptography.RSA" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.Signature" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="CA" source="Network.Network" target="Cryptography.CertificateAuthority" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Cryptography.BlockCipher" target="Cryptography.BlockCipherADT"/>
+    <UseRelation source="Network.Network" target="Network.Packet" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <ImplementsRelation name="&lt;&lt;implements&gt;&gt;" source="Network.Packet" target="Network.PacketADT"/>
+    <UseRelation source="Cryptography.CertificateAuthorityADT" target="Network.Receiver" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Network.Receiver" target="Network.Packet" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.RSAADT" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <HasRelation name="MAC" source="Network.Network" target="Cryptography.MAC" type="Aggregation" sourceCardinality="1..1" targetCardinality="1..1"/>
+    <UseRelation source="Cryptography.CertificateAuthority" target="Cryptography.RSAKey" sourceCardinality="1..1" targetCardinality="1..1"/>
+  </ClassDiagramRelations>
+</ClassDiagram>
