@@ -54,7 +54,7 @@ public class ChatServer
     //Created a random nonce
     static final Random RAND = new Random();
     static final BigInteger NONCE = BigInteger.valueOf(Math.abs(RAND.nextInt()));
-    
+
     //Initializes ASCII converter
     static final AsciiConverter ASCII = new AsciiConverter();
     //Different cipher cases that are used
@@ -62,15 +62,15 @@ public class ChatServer
     {
         "2", "3", "4", "5"
     };
-    
+
     //Creates RSA
     static RSA RSA = new RSA();
     static RSAKey PUBLIC_KEY = RSA.getPublicKey();
     static RSAKey PRIVATE_KEY = RSA.getPrivateKey();
-    
+
     //Initializes arraylist packet
     static final ArrayList<Packet> PACKETS = new ArrayList<>();
-    
+
     //nitialize mac
     static final MAC MAC = new MAC();
 
@@ -83,10 +83,17 @@ public class ChatServer
 
     //Initialization Vector for CBC
     static String IV;
-    
+
     //Substitution Key for Substitution Cipher
     static char[] SUB_KEY;
 
+    /**
+     * Main class, handles logic for communication.
+     *
+     * @param args Not used
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     */
     public static void main(String[] args)
     {
 
@@ -570,7 +577,6 @@ public class ChatServer
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
                     result = cbc.Decrypt(ASCII.BigIntToString(message), IV);
-                    result = result.substring(1);   //Remove IV at front
                     break;
 
                 //Block Cipher + MAC

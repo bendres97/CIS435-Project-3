@@ -81,6 +81,12 @@ class ChatClient
     //Substitution Key for Substitution Cipher
     static char[] SUB_KEY;
 
+     /**
+     * Main class, handles logic for communication.
+     * @param args Not used
+     * @author Bryan Endres
+     * @author Andrew Bradley
+     */
     public static void main(String[] args)
     {
 
@@ -554,7 +560,6 @@ class ChatClient
                 case CASE4:
                     CipherBlockChain cbc = new CipherBlockChain();
                     result = cbc.Decrypt(ASCII.BigIntToString(message), IV);
-                    result = result.substring(1);   //Remove IV at front
                     break;
 
                 //Block Cipher + MAC
